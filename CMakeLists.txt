@@ -5,7 +5,7 @@ set( WITH_CYCLES_STANDALONE_GUI  OFF CACHE INTERNAL "" )
 set( WITH_CYCLES_OSL             ON CACHE INTERNAL "" )
 #set( WITH_CYCLES_LOGGING         ON CACHE INTERNAL "" )
 set( WITH_CYCLES_DEBUG           ON CACHE INTERNAL "" )
-set( WITH_CYCLES_OPENSUBDIV      ON CACHE INTERNAL "" )
+set( WITH_CYCLES_OPENSUBDIV      OFF CACHE INTERNAL "" )
 set( OPENSUBDIV_ROOT_DIR         ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( BOOST_ROOT                  ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( LLVM_STATIC                 ON CACHE INTERNAL "" )
@@ -35,6 +35,15 @@ set(CYCLES_INCLUDE_DIR
 
 project(GafferCycles)
 
+set( CORTEX_LOCATION ${GAFFER_ROOT} CACHE INTERNAL "" )
+
+list(APPEND CMAKE_MODULE_PATH
+	"${PROJECT_SOURCE_DIR}/cycles/src/cmake/Modules"
+    "${PROJECT_SOURCE_DIR}/cmake/Modules"
+)
+find_package(OpenSubdiv REQUIRED)
+find_package(Cortex REQUIRED)
+
 # Cycles defines
 add_definitions(
 	-DCCL_NAMESPACE_BEGIN=namespace\ ccl\ {
@@ -43,22 +52,24 @@ add_definitions(
 
 set(CMAKE_CXX_STANDARD 11)
 
+link_directories( ${GAFFER_ROOT}/lib )
+
 # IECoreCycles
 set(IECORECYCLES_CXX_FILES
+    src/GafferCycles/IECoreCyclesPreview/AttributeAlgo.cpp
     src/GafferCycles/IECoreCyclesPreview/CameraAlgo.cpp
     src/GafferCycles/IECoreCyclesPreview/CurvesAlgo.cpp
     src/GafferCycles/IECoreCyclesPreview/InstancingConverter.cpp
-    src/GafferCycles/IECoreCyclesPreview/LightAlgo.cpp
     src/GafferCycles/IECoreCyclesPreview/MeshAlgo.cpp
     src/GafferCycles/IECoreCyclesPreview/ObjectAlgo.cpp
     #src/GafferCycles/IECoreCyclesPreview/Renderer.cpp
     )
 set(IECORECYCLES_H_FILES
-    include/GafferCycles/IECoreCyclesPreview/Export.h
+    include/GafferCycles/IECoreCyclesPreview/AttributeAlgo.h
     include/GafferCycles/IECoreCyclesPreview/CameraAlgo.h
     include/GafferCycles/IECoreCyclesPreview/CurvesAlgo.h
+    include/GafferCycles/IECoreCyclesPreview/Export.h
     include/GafferCycles/IECoreCyclesPreview/InstancingConverter.h
-    include/GafferCycles/IECoreCyclesPreview/LightAlgo.h
     include/GafferCycles/IECoreCyclesPreview/MeshAlgo.h
     include/GafferCycles/IECoreCyclesPreview/ObjectAlgo.h
     include/GafferCycles/IECoreCyclesPreview/SocketAlgo.h
@@ -80,8 +91,9 @@ set(GAFFERCYCLES_H_FILES
     )
 
 add_library(GafferCycles SHARED ${IECORECYCLES_CXX_FILES} ${IECORECYCLES_H_FILES} ${GAFFERCYCLES_CXX_FILES} ${GAFFERCYCLES_H_FILES})
-target_include_directories(GafferCycles PRIVATE include ${GAFFER_DEPENDENCIES_ROOT}/include ${GAFFER_ROOT}/include ${CYCLES_INCLUDE_DIR})
-target_link_libraries(GafferCycles ${CYCLES_LIBRARIES})
+target_include_directories(GafferCycles PRIVATE include ${GAFFER_DEPENDENCIES_ROOT}/include ${GAFFER_ROOT}/include ${CYCLES_INCLUDE_DIR} ${OPENSUBDIV_INCLUDE_DIR})
+target_link_libraries(GafferCycles ${Cortex_IECORE_LIBRARY} ${Cortex_IECORESCENE_LIBRARY} ${CYCLES_LIBRARIES} ${OPENSUBDIV_LIBRARIES})
+add_dependencies( GafferCycles cycles )
 
 install(TARGETS GafferCycles DESTINATION lib)
 install(FILES ${GAFFERCYCLES_H_FILES}
@@ -92,10 +104,9 @@ install(FILES ${IECORECYCLES_H_FILES}
 # GafferCyclesModule
 add_library(GafferCyclesModule MODULE src/GafferCyclesModule/GafferCyclesModule.cpp)
 set_target_properties(GafferCyclesModule PROPERTIES PREFIX "" OUTPUT_NAME "_GafferCycles" )
-
 target_link_libraries(GafferCyclesModule GafferCycles)
-
 target_include_directories(GafferCyclesModule PRIVATE include ${GAFFER_ROOT}/include ${GAFFER_ROOT}/include/python2.7)
+add_dependencies( GafferCyclesModule GafferCycles )
 
 install(TARGETS GafferCyclesModule DESTINATION python/GafferCycles)
 
