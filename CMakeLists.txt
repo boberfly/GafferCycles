@@ -70,6 +70,7 @@ set(IECORECYCLES_CXX_FILES
     src/GafferCycles/IECoreCyclesPreview/InstancingConverter.cpp
     src/GafferCycles/IECoreCyclesPreview/MeshAlgo.cpp
     src/GafferCycles/IECoreCyclesPreview/ObjectAlgo.cpp
+    src/GafferCycles/IECoreCyclesPreview/SocketAlgo.cpp
     #src/GafferCycles/IECoreCyclesPreview/Renderer.cpp
     )
 set(IECORECYCLES_H_FILES
