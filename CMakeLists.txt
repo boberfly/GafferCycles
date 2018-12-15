@@ -67,7 +67,6 @@ set(IECORECYCLES_CXX_FILES
     src/GafferCycles/IECoreCyclesPreview/AttributeAlgo.cpp
     src/GafferCycles/IECoreCyclesPreview/CameraAlgo.cpp
     src/GafferCycles/IECoreCyclesPreview/CurvesAlgo.cpp
-    src/GafferCycles/IECoreCyclesPreview/InstancingConverter.cpp
     src/GafferCycles/IECoreCyclesPreview/MeshAlgo.cpp
     src/GafferCycles/IECoreCyclesPreview/ObjectAlgo.cpp
     src/GafferCycles/IECoreCyclesPreview/SocketAlgo.cpp
@@ -78,7 +77,6 @@ set(IECORECYCLES_H_FILES
     include/GafferCycles/IECoreCyclesPreview/CameraAlgo.h
     include/GafferCycles/IECoreCyclesPreview/CurvesAlgo.h
     include/GafferCycles/IECoreCyclesPreview/Export.h
-    include/GafferCycles/IECoreCyclesPreview/InstancingConverter.h
     include/GafferCycles/IECoreCyclesPreview/MeshAlgo.h
     include/GafferCycles/IECoreCyclesPreview/ObjectAlgo.h
     include/GafferCycles/IECoreCyclesPreview/SocketAlgo.h
@@ -89,6 +87,7 @@ set(GAFFERCYCLES_CXX_FILES
     src/GafferCycles/CyclesOptions.cpp
     src/GafferCycles/CyclesRender.cpp
     src/GafferCycles/InteractiveCyclesRender.cpp
+    src/GafferCycles/SocketHandler.cpp
     )
 set(GAFFERCYCLES_H_FILES
     include/GafferCycles/CyclesAttributes.h
@@ -96,6 +95,7 @@ set(GAFFERCYCLES_H_FILES
     include/GafferCycles/CyclesRender.h
     include/GafferCycles/Export.h
     include/GafferCycles/InteractiveCyclesRender.h
+    include/GafferCycles/SocketHandler.h
     include/GafferCycles/TypeIds.h
     )
 
