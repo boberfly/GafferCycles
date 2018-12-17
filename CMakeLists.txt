@@ -99,9 +99,25 @@ set(GAFFERCYCLES_H_FILES
     include/GafferCycles/TypeIds.h
     )
 
-add_library(GafferCycles SHARED ${IECORECYCLES_CXX_FILES} ${IECORECYCLES_H_FILES} ${GAFFERCYCLES_CXX_FILES} ${GAFFERCYCLES_H_FILES})
-target_include_directories(GafferCycles PRIVATE include ${GAFFER_DEPENDENCIES_ROOT}/include ${GAFFER_ROOT}/include ${CYCLES_INCLUDE_DIR} ${OPENSUBDIV_INCLUDE_DIR})
-target_link_libraries(GafferCycles ${Cortex_IECORE_LIBRARY} ${Cortex_IECORESCENE_LIBRARY} ${CYCLES_LIBRARIES} ${OPENSUBDIV_LIBRARIES})
+add_library(GafferCycles SHARED 
+    ${IECORECYCLES_CXX_FILES} 
+    ${IECORECYCLES_H_FILES} 
+    ${GAFFERCYCLES_CXX_FILES} 
+    ${GAFFERCYCLES_H_FILES}
+    )
+target_include_directories(GafferCycles PRIVATE 
+    include 
+    ${GAFFER_DEPENDENCIES_ROOT}/include 
+    ${GAFFER_ROOT}/include 
+    ${CYCLES_INCLUDE_DIR} 
+    ${OPENSUBDIV_INCLUDE_DIR}
+    )
+target_link_libraries(GafferCycles 
+    ${Cortex_IECORE_LIBRARY} 
+    ${Cortex_IECORESCENE_LIBRARY} 
+    ${CYCLES_LIBRARIES} 
+    ${OPENSUBDIV_LIBRARIES}
+    )
 add_dependencies( GafferCycles cycles )
 
 install(TARGETS GafferCycles DESTINATION lib)
@@ -111,10 +127,19 @@ install(FILES ${IECORECYCLES_H_FILES}
         DESTINATION include/GafferCycles/IECoreCyclesPreview)
 
 # GafferCyclesModule
-add_library(GafferCyclesModule MODULE src/GafferCyclesModule/GafferCyclesModule.cpp)
+add_library(GafferCyclesModule MODULE 
+    src/GafferCyclesModule/GafferCyclesModule.cpp
+    )
 set_target_properties(GafferCyclesModule PROPERTIES PREFIX "" OUTPUT_NAME "_GafferCycles" )
-target_link_libraries(GafferCyclesModule GafferCycles)
-target_include_directories(GafferCyclesModule PRIVATE include ${GAFFER_ROOT}/include ${GAFFER_ROOT}/include/python2.7)
+target_link_libraries(GafferCyclesModule 
+    GafferCycles 
+    ${CYCLES_LIBRARIES}
+    )
+target_include_directories(GafferCyclesModule PRIVATE 
+    include ${GAFFER_ROOT}/include 
+    ${GAFFER_ROOT}/include/python2.7 
+    ${CYCLES_INCLUDE_DIR}
+    )
 add_dependencies( GafferCyclesModule GafferCycles )
 
 install(TARGETS GafferCyclesModule DESTINATION python/GafferCycles)
