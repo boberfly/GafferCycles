@@ -56,43 +56,53 @@ find_package(Cortex REQUIRED)
 add_definitions(
 	-DCCL_NAMESPACE_BEGIN=namespace\ ccl\ {
 	-DCCL_NAMESPACE_END=}
+    -DWITH_OSL=1
 )
 
 set(CMAKE_CXX_STANDARD 11)
 
 link_directories( ${GAFFER_ROOT}/lib )
 
+set( IECORECYCLES_INCLUDE_DIR include/GafferCycles/IECoreCyclesPreview )
+set( IECORECYCLES_SRC_DIR src/GafferCycles/IECoreCyclesPreview )
+
 # IECoreCycles
 set(IECORECYCLES_CXX_FILES
-    src/GafferCycles/IECoreCyclesPreview/AttributeAlgo.cpp
-    src/GafferCycles/IECoreCyclesPreview/CameraAlgo.cpp
-    src/GafferCycles/IECoreCyclesPreview/CurvesAlgo.cpp
-    src/GafferCycles/IECoreCyclesPreview/MeshAlgo.cpp
-    src/GafferCycles/IECoreCyclesPreview/ObjectAlgo.cpp
-    src/GafferCycles/IECoreCyclesPreview/SocketAlgo.cpp
-    #src/GafferCycles/IECoreCyclesPreview/Renderer.cpp
+    ${IECORECYCLES_SRC_DIR}/AttributeAlgo.cpp
+    ${IECORECYCLES_SRC_DIR}/CameraAlgo.cpp
+    ${IECORECYCLES_SRC_DIR}/CurvesAlgo.cpp
+    ${IECORECYCLES_SRC_DIR}/MeshAlgo.cpp
+    ${IECORECYCLES_SRC_DIR}/ObjectAlgo.cpp
+    ${IECORECYCLES_SRC_DIR}/ShaderNetworkAlgo.cpp
+    ${IECORECYCLES_SRC_DIR}/SocketAlgo.cpp
+    ${IECORECYCLES_SRC_DIR}/Renderer.cpp
     )
 set(IECORECYCLES_H_FILES
-    include/GafferCycles/IECoreCyclesPreview/AttributeAlgo.h
-    include/GafferCycles/IECoreCyclesPreview/CameraAlgo.h
-    include/GafferCycles/IECoreCyclesPreview/CurvesAlgo.h
-    include/GafferCycles/IECoreCyclesPreview/Export.h
-    include/GafferCycles/IECoreCyclesPreview/MeshAlgo.h
-    include/GafferCycles/IECoreCyclesPreview/ObjectAlgo.h
-    include/GafferCycles/IECoreCyclesPreview/SocketAlgo.h
+    ${IECORECYCLES_INCLUDE_DIR}/AttributeAlgo.h
+    ${IECORECYCLES_INCLUDE_DIR}/CameraAlgo.h
+    ${IECORECYCLES_INCLUDE_DIR}/CurvesAlgo.h
+    ${IECORECYCLES_INCLUDE_DIR}/Export.h
+    ${IECORECYCLES_INCLUDE_DIR}/MeshAlgo.h
+    ${IECORECYCLES_INCLUDE_DIR}/ObjectAlgo.h
+    ${IECORECYCLES_INCLUDE_DIR}/ShaderNetworkAlgo.h
+    ${IECORECYCLES_INCLUDE_DIR}/SocketAlgo.h
     )
 # GafferCycles
 set(GAFFERCYCLES_CXX_FILES
     src/GafferCycles/CyclesAttributes.cpp
+    src/GafferCycles/CyclesLight.cpp
     src/GafferCycles/CyclesOptions.cpp
     src/GafferCycles/CyclesRender.cpp
+    src/GafferCycles/CyclesShader.cpp
     src/GafferCycles/InteractiveCyclesRender.cpp
     src/GafferCycles/SocketHandler.cpp
     )
 set(GAFFERCYCLES_H_FILES
     include/GafferCycles/CyclesAttributes.h
+    include/GafferCycles/CyclesLight.h
     include/GafferCycles/CyclesOptions.h
     include/GafferCycles/CyclesRender.h
+    include/GafferCycles/CyclesShader.h
     include/GafferCycles/Export.h
     include/GafferCycles/InteractiveCyclesRender.h
     include/GafferCycles/SocketHandler.h
