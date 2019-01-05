@@ -20,6 +20,7 @@ set( BOOST_ROOT                  ${GAFFER_ROOT} CACHE INTERNAL "" )
 #set( LLVM_ROOT_DIR               ${GAFFER_DEPENDENCIES_ROOT} CACHE INTERNAL "" )
 set( OPENIMAGEIO_ROOT_DIR        ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( OSL_ROOT_DIR                ${GAFFER_ROOT} CACHE INTERNAL "" )
+set( OPENEXR_ROOT_DIR            ${GAFFER_ROOT} CACHE INTERNAL "" )
 add_subdirectory( cycles )
 
 # Cycles Standalone source/headers
@@ -51,6 +52,8 @@ list(APPEND CMAKE_MODULE_PATH
 )
 find_package(OpenSubdiv REQUIRED)
 find_package(Cortex REQUIRED)
+find_package(OpenEXR REQUIRED Imath)
+find_package(OpenShadingLanguage REQUIRED)
 
 # Cycles defines
 add_definitions(
@@ -123,8 +126,12 @@ target_include_directories(GafferCycles PRIVATE
     ${OPENSUBDIV_INCLUDE_DIR}
     )
 target_link_libraries(GafferCycles 
+    ${OPENEXR_IMATH_LIBRARY}
+    ${OSL_LIBRARIES}
     ${Cortex_IECORE_LIBRARY} 
     ${Cortex_IECORESCENE_LIBRARY} 
+    Gaffer
+    GafferOSL
     ${CYCLES_LIBRARIES} 
     ${OPENSUBDIV_LIBRARIES}
     )
@@ -160,7 +167,13 @@ install(FILES ${GAFFERCYCLES_PY_FILES}
         DESTINATION python/GafferCycles)
 
 # GafferCyclesUI
-file(GLOB GAFFERCYCLES_UI_FILES python/GafferCyclesUI/*.py)
+file(GLOB GAFFERCYCLES_UI_PY_FILES python/GafferCyclesUI/*.py)
 
-install(FILES ${GAFFERCYCLES_UI_FILES}
+install(FILES ${GAFFERCYCLES_UI_PY_FILES}
         DESTINATION python/GafferCyclesUI)
+
+# Startup
+file(GLOB GAFFERCYCLES_STARTUP_FILES startup/gui/*.py)
+
+install(FILES ${GAFFERCYCLES_STARTUP_FILES}
+        DESTINATION startup)
