@@ -176,4 +176,4 @@ install(FILES ${GAFFERCYCLES_UI_PY_FILES}
 file(GLOB GAFFERCYCLES_STARTUP_FILES startup/gui/*.py)
 
 install(FILES ${GAFFERCYCLES_STARTUP_FILES}
-        DESTINATION startup)
+        DESTINATION startup/gui/)
