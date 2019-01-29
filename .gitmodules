@@ -1,3 +1,4 @@
 [submodule "cycles"]
 	path = cycles
 	url = https://github.com/boberfly/cycles
+	branch = gaffer
