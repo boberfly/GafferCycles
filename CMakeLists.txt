@@ -132,6 +132,7 @@ target_link_libraries(GafferCycles
     ${Cortex_IECORESCENE_LIBRARY} 
     Gaffer
     GafferOSL
+    GafferScene
     ${CYCLES_LIBRARIES} 
     ${OPENSUBDIV_LIBRARIES}
     )
@@ -173,7 +174,4 @@ install(FILES ${GAFFERCYCLES_UI_PY_FILES}
         DESTINATION python/GafferCyclesUI)
 
 # Startup
-file(GLOB GAFFERCYCLES_STARTUP_FILES startup/gui/*.py)
-
-install(FILES ${GAFFERCYCLES_STARTUP_FILES}
-        DESTINATION startup/gui/)
+install(DIRECTORY startup DESTINATION .)
