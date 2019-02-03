@@ -17,6 +17,7 @@ for the optional dependencies OpenSubdiv and Embree.
 ```
 export GAFFER_ROOT=<gaffer install path>
 export GAFFERCYCLES=<install destination>
+export LD_LIBRARY_PATH=$GAFFER_ROOT/lib
 
 git clone --recurse-submodules https://github.com/boberfly/GafferCycles.git
 cd GafferCycles
