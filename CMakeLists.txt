@@ -93,6 +93,7 @@ set(IECORECYCLES_H_FILES
 # GafferCycles
 set(GAFFERCYCLES_CXX_FILES
     src/GafferCycles/CyclesAttributes.cpp
+    src/GafferCycles/CyclesBackground.cpp
     src/GafferCycles/CyclesLight.cpp
     src/GafferCycles/CyclesOptions.cpp
     src/GafferCycles/CyclesRender.cpp
@@ -102,6 +103,7 @@ set(GAFFERCYCLES_CXX_FILES
     )
 set(GAFFERCYCLES_H_FILES
     include/GafferCycles/CyclesAttributes.h
+    include/GafferCycles/CyclesBackground.h
     include/GafferCycles/CyclesLight.h
     include/GafferCycles/CyclesOptions.h
     include/GafferCycles/CyclesRender.h
