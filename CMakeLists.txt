@@ -35,6 +35,7 @@ set(CYCLES_LIBRARIES
     cycles_util
     extern_clew
     extern_cuew
+    extern_numaapi
     )
 
 set(CYCLES_INCLUDE_DIR 
