@@ -8,11 +8,13 @@ add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 # Silence deprecation warning (Gaffer uses this)
 add_definitions(-DBOOST_SIGNALS_NO_DEPRECATION_WARNING=1)
 
+# If in debug mode, enable this flag so that you don't get memory corruption
+add_compile_options("$<$<CONFIG:DEBUG>:-DWITH_CYCLES_DEBUG=1>")
+
 # Cycles Standalone
 set( WITH_CYCLES_STANDALONE_GUI  OFF CACHE INTERNAL "" )
 set( WITH_CYCLES_OSL             ON CACHE INTERNAL "" )
 #set( WITH_CYCLES_LOGGING         ON CACHE INTERNAL "" )
-set( WITH_CYCLES_DEBUG           ON CACHE INTERNAL "" )
 #set( WITH_CYCLES_OPENSUBDIV      OFF CACHE INTERNAL "" )
 #set( OPENSUBDIV_ROOT_DIR         ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( BOOST_ROOT                  ${GAFFER_ROOT} CACHE INTERNAL "" )
