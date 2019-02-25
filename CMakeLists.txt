@@ -15,8 +15,10 @@ add_compile_options("$<$<CONFIG:DEBUG>:-DWITH_CYCLES_DEBUG=1>")
 set( WITH_CYCLES_STANDALONE_GUI  OFF CACHE INTERNAL "" )
 set( WITH_CYCLES_OSL             ON CACHE INTERNAL "" )
 #set( WITH_CYCLES_LOGGING         ON CACHE INTERNAL "" )
-#set( WITH_CYCLES_OPENSUBDIV      OFF CACHE INTERNAL "" )
-#set( OPENSUBDIV_ROOT_DIR         ${GAFFER_ROOT} CACHE INTERNAL "" )
+set( WITH_CYCLES_OPENSUBDIV      ON CACHE INTERNAL "" )
+set( WITH_CYCLES_EMBREE          ON CACHE INTERNAL "" )
+set( OPENSUBDIV_ROOT_DIR         ${CMAKE_INSTALL_PREFIX} CACHE INTERNAL "" )
+#set( embree_DIR                  ${CMAKE_INSTALL_PREFIX} CACHE INTERNAL "" )
 set( BOOST_ROOT                  ${GAFFER_ROOT} CACHE INTERNAL "" )
 #set( LLVM_STATIC                 ON CACHE INTERNAL "" )
 #set( LLVM_ROOT_DIR               ${GAFFER_DEPENDENCIES_ROOT} CACHE INTERNAL "" )
@@ -53,16 +55,23 @@ list(APPEND CMAKE_MODULE_PATH
 	"${PROJECT_SOURCE_DIR}/cycles/src/cmake/Modules"
     "${PROJECT_SOURCE_DIR}/cmake/Modules"
 )
+list(APPEND CMAKE_PREFIX_PATH
+    "${CMAKE_INSTALL_PREFIX}/lib/cmake/embree-3.5.0"
+    "${GAFFER_ROOT}/lib/cmake/embree-3.5.0"
+)
 find_package(OpenSubdiv REQUIRED)
 find_package(Cortex REQUIRED)
 find_package(OpenEXR REQUIRED Imath)
 find_package(OpenShadingLanguage REQUIRED)
+find_package(Embree "3.5.0" REQUIRED)
 
 # Cycles defines
 add_definitions(
 	-DCCL_NAMESPACE_BEGIN=namespace\ ccl\ {
 	-DCCL_NAMESPACE_END=}
     -DWITH_OSL=1
+    -DWITH_EMBREE=1
+    -DWITH_OPENSUBDIV=1
 )
 
 set(CMAKE_CXX_STANDARD 11)
@@ -140,6 +149,7 @@ target_link_libraries(GafferCycles
     GafferScene
     ${CYCLES_LIBRARIES} 
     ${OPENSUBDIV_LIBRARIES}
+    ${EMBREE_LIBRARIES}
     )
 add_dependencies( GafferCycles cycles )
 
@@ -162,6 +172,7 @@ target_include_directories(GafferCyclesModule PRIVATE
     include ${GAFFER_ROOT}/include 
     ${GAFFER_ROOT}/include/python2.7 
     ${CYCLES_INCLUDE_DIR}
+    ${EMBREE_INCLUDE_DIRS}
     )
 add_dependencies( GafferCyclesModule GafferCycles )
 
