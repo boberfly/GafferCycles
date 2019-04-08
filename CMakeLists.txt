@@ -25,6 +25,7 @@ set( BOOST_ROOT                  ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( OPENIMAGEIO_ROOT_DIR        ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( OSL_ROOT_DIR                ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( OPENEXR_ROOT_DIR            ${GAFFER_ROOT} CACHE INTERNAL "" )
+set( WITH_CYCLES_CUDA_BINARIES   ON CACHE INTERNAL "" )
 add_subdirectory( cycles )
 
 # Cycles Standalone source/headers

@@ -8,8 +8,8 @@ if [[ -z "${GAFFER_ROOT}" ]]; then
 fi
 
 # Packaging variables
-VERSION=0.1.0
-GAFFERVERSION=0.53.0.0
+VERSION=0.3.0
+GAFFERVERSION=0.53.1.0
 
 if [[ -z "${GAFFER_BUILD_TYPE}" ]]; then
     echo "WARNING : GAFFER_BUILD_TYPE environment variable not set, defaulting to release"
@@ -58,6 +58,7 @@ manifest="
 
     doc/*
     include/*
+    lib/*.cubin
     lib/libembree3$SHLIBSUFFIX*
     lib/libosdCPU$SHLIBSUFFIX*
     lib/libGafferCycles$SHLIBSUFFIX
