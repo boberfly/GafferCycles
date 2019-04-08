@@ -70,9 +70,14 @@ find_package(Embree "3.5.0" REQUIRED)
 add_definitions(
 	-DCCL_NAMESPACE_BEGIN=namespace\ ccl\ {
 	-DCCL_NAMESPACE_END=}
+#	-DCCL_NAMESPACE_BEGIN=namespace\ IECoreCycles\ {\ namespace\ ccl\ {
+#	-DCCL_NAMESPACE_END=}\}
     -DWITH_OSL=1
     -DWITH_EMBREE=1
     -DWITH_OPENSUBDIV=1
+    -DWITH_OPENCL=1
+    -DWITH_CUDA=1
+    -DWITH_MULTI=1
 )
 
 set(CMAKE_CXX_STANDARD 11)
