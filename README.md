@@ -37,4 +37,6 @@ Run Gaffer:
 
 `gaffer`
 
-> Caveat: This is still very much WIP, it will not function as-is.
+GafferCycles should be stable enough to try out now, I have made builds for Linux under releases. Try 0.3.0 onwards, GPU devices should work but I haven't tested on Nvidia/CUDA yet.
+
+The runtime just needs $GAFFERCYCLES set to the extracted path (so that shaders/kernels can be found) and $GAFFER_EXTENSION_PATHS so that Gaffer will detect GafferCycles.
