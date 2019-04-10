@@ -8,7 +8,7 @@ if [[ -z "${GAFFER_ROOT}" ]]; then
 fi
 
 # Packaging variables
-VERSION=0.3.1
+VERSION=0.4.0
 GAFFERVERSION=0.53.1.0
 
 if [[ -z "${GAFFER_BUILD_TYPE}" ]]; then
