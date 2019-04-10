@@ -18,8 +18,12 @@
 			" -D CMAKE_INSTALL_PREFIX={buildDir}"
 			" -D CMAKE_PREFIX_PATH={buildDir}"
 			" -D {libLinkType}"
-			" -D EMBREE_ISPC_SUPPORT=OFF"
-			" -D EMBREE_TUTORIALS=OFF"
+			" -DEMBREE_ISPC_SUPPORT=OFF"
+			" -DEMBREE_TUTORIALS=OFF"
+			" -DEMBREE_RAY_MASK=ON"
+			" -DEMBREE_FILTER_FUNCTION=ON"
+			" -DEMBREE_BACKFACE_CULLING=OFF"
+			" -DEMBREE_TASKING_SYSTEM=INTERNAL"
 			" ..",
 		"cd gafferBuild && cmake --build . --config {cmakeBuildType} --target install -- -j {jobs}",
 

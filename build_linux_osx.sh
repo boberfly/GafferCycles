@@ -8,7 +8,7 @@ if [[ -z "${GAFFER_ROOT}" ]]; then
 fi
 
 # Packaging variables
-VERSION=0.3.0
+VERSION=0.3.1
 GAFFERVERSION=0.53.1.0
 
 if [[ -z "${GAFFER_BUILD_TYPE}" ]]; then
@@ -72,6 +72,9 @@ manifest="
 
 cd $GAFFERCYCLES_INSTALL
 packageName=gafferCycles-$VERSION-gaffer-$GAFFERVERSION-$PLATFORM
+if [[ $GAFFER_BUILD_TYPE == "debug" ]]; then
+    packageName=$packageName-$GAFFER_BUILD_TYPE
+fi
 archiveName=$packageName.tar.gz
 
 tar -c -z -f /tmp/intermediate.tar $manifest
