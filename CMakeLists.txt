@@ -26,6 +26,8 @@ set( OPENIMAGEIO_ROOT_DIR        ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( OSL_ROOT_DIR                ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( OPENEXR_ROOT_DIR            ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( WITH_CYCLES_CUDA_BINARIES   ON CACHE INTERNAL "" )
+set( WITH_OPENCOLORIO            OFF CACHE INTERNAL "" )
+set( WITH_CYCLES_LOGGING         OFF CACHE INTERNAL "" )
 add_subdirectory( cycles )
 
 # Cycles Standalone source/headers
@@ -51,6 +53,7 @@ set(CYCLES_INCLUDE_DIR
 project(GafferCycles)
 
 set( CORTEX_LOCATION ${GAFFER_ROOT} CACHE INTERNAL "" )
+set( OCIO_PATH ${GAFFER_ROOT} CACHE INTERNAL "" )
 
 list(APPEND CMAKE_MODULE_PATH
 	"${PROJECT_SOURCE_DIR}/cycles/src/cmake/Modules"

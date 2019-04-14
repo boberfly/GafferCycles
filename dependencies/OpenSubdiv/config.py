@@ -16,7 +16,8 @@
 			" -G {cmakeGenerator}"
 			" -D CMAKE_CXX_COMPILER={cxxCompiler}"
 			" -D CMAKE_INSTALL_PREFIX={buildDir}"
-			" -D CMAKE_PREFIX_PATH={buildDir}"
+			" -D CMAKE_PREFIX_PATH={gafferRoot}"
+			" -D CMAKE_BUILD_TYPE={cmakeBuildType}"
 			" -D NO_EXAMPLES=1"
 			" -D NO_TUTORIALS=1"
 			" -D NO_REGRESSION=1"
@@ -32,7 +33,7 @@
 			" -D NO_GLTESTS=1"
 			" -D NO_GLFW=1"
 			" -D NO_GLFW_X11=1"
-			" -D GLEW_LOCATION={buildDir}"
+			" -D GLEW_LOCATION={gafferRoot}"
 			" ..",
 		"cd gafferBuild && cmake --build . --config {cmakeBuildType} --target install -- -j {jobs}",
 

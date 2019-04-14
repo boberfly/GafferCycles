@@ -51,7 +51,7 @@ def __decompress( archive ) :
 		# Badly behaved archive
 		return "./"
 
-def __loadConfig( project, buildDir, buildType, forceLibLinkType, forceCCompiler, forceCxxCompiler ) :
+def __loadConfig( project, gafferRoot, buildDir, buildType, forceLibLinkType, forceCCompiler, forceCxxCompiler ) :
 
 	# Load file. Really we want to use JSON to
 	# enforce a "pure data" methodology, but JSON
@@ -104,6 +104,10 @@ def __loadConfig( project, buildDir, buildType, forceLibLinkType, forceCCompiler
 		boostBuildType = "debug"
 	elif buildType == "relWithDebInfo":
 		cmakeBuildType = "RelWithDebInfo"
+	
+	if( gafferRoot == "")
+		gafferRoot = buildDir
+
 	default_variables = {
 		"buildDir" : buildDir,
 		"buildDirFwd" : buildDir.replace("\\", "/"),
@@ -114,6 +118,7 @@ def __loadConfig( project, buildDir, buildType, forceLibLinkType, forceCCompiler
 		"libLinkType" : libLinkType,
 		"cCompiler" : forceCCompiler,
 		"cxxCompiler" : forceCxxCompiler,
+		"gafferRoot" : gafferRoot,
 	}
 	missing_variables = { k:v for (k, v) in default_variables.items() if k not in variables }
 	variables.update( missing_variables )
@@ -145,9 +150,9 @@ def __loadConfig( project, buildDir, buildType, forceLibLinkType, forceCCompiler
 
 	return __substitute( config )
 
-def __buildProject( project, buildDir, buildType, forceLibLinkType, forceCCompiler, forceCxxCompiler ) :
+def __buildProject( project, gafferRoort, buildDir, buildType, forceLibLinkType, forceCCompiler, forceCxxCompiler ) :
 
-	config = __loadConfig( project, buildDir, buildType, forceLibLinkType, forceCCompiler, forceCxxCompiler )
+	config = __loadConfig( project, gafferRoot, buildDir, buildType, forceLibLinkType, forceCCompiler, forceCxxCompiler )
 
 	archiveDir = project + "/archives"
 	if not os.path.exists( archiveDir ) :
@@ -217,6 +222,12 @@ parser.add_argument(
 )
 
 parser.add_argument(
+	"--gafferRoot",
+	default = "",
+	help = "The directory where Gaffer is located. Defaults to buildDir"
+)
+
+parser.add_argument(
 	"--buildType",
 	choices = ["release", "debug", "relWithDebInfo"],
 	default = "release",
@@ -243,4 +254,4 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
-__buildProject( args.project, args.buildDir, args.buildType, args.forceLibLinkType, args.forceCCompiler, args.forceCxxCompiler )
+__buildProject( args.project, args.gafferRoot, args.buildDir, args.buildType, args.forceLibLinkType, args.forceCCompiler, args.forceCxxCompiler )
