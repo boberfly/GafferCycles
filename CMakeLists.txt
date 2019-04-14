@@ -28,6 +28,7 @@ set( OPENEXR_ROOT_DIR            ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( WITH_CYCLES_CUDA_BINARIES   ON CACHE INTERNAL "" )
 set( WITH_OPENCOLORIO            OFF CACHE INTERNAL "" )
 set( WITH_CYCLES_LOGGING         OFF CACHE INTERNAL "" )
+set( GLEW_ROOT_DIR            ${GAFFER_ROOT} CACHE INTERNAL "" )
 add_subdirectory( cycles )
 
 # Cycles Standalone source/headers

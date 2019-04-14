@@ -303,8 +303,8 @@ depCommands = [
 	"cmake -E make_directory install/{platform}_{buildType}".format( **formatVariables ),
 
 	"cd dependencies && "
-	"./build/build.py --project Embree --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx} && "
-	"./build/build.py --project OpenSubdiv --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx}".format( 
+	"./build/build.py --project Embree --gafferRoot {gafferRoot} --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx} && "
+	"./build/build.py --project OpenSubdiv --gafferRoot {gafferRoot} --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx}".format( 
 		gafferCyclesRoot=gafferCyclesDirName, gafferRoot=gafferDirName, **formatVariables ),
 ]
 
