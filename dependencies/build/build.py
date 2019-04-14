@@ -150,7 +150,7 @@ def __loadConfig( project, gafferRoot, buildDir, buildType, forceLibLinkType, fo
 
 	return __substitute( config )
 
-def __buildProject( project, gafferRoort, buildDir, buildType, forceLibLinkType, forceCCompiler, forceCxxCompiler ) :
+def __buildProject( project, gafferRoot, buildDir, buildType, forceLibLinkType, forceCCompiler, forceCxxCompiler ) :
 
 	config = __loadConfig( project, gafferRoot, buildDir, buildType, forceLibLinkType, forceCCompiler, forceCxxCompiler )
 
