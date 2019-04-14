@@ -105,7 +105,7 @@ def __loadConfig( project, gafferRoot, buildDir, buildType, forceLibLinkType, fo
 	elif buildType == "relWithDebInfo":
 		cmakeBuildType = "RelWithDebInfo"
 	
-	if( gafferRoot == "")
+	if gafferRoot == "" :
 		gafferRoot = buildDir
 
 	default_variables = {
