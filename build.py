@@ -216,7 +216,7 @@ if args.docker and not os.path.exists( "/.dockerenv" ) :
 
 	if not args.interactive :
 		# Copy out the generated package.
-		copyCommand = "docker cp {container}:{output}/{uploadFile} ./out".format(
+		copyCommand = "docker cp {container}:/out/{uploadFile} {output}".format(
 			container = containerName,
 			**formatVariables
 		)
@@ -321,6 +321,7 @@ commands = [
 		" ../..".format( gafferCyclesRoot=gafferCyclesDirName, gafferRoot=gafferDirName, **formatVariables ),
 
 	"cd build/{platform}_{buildType} && cmake --build . --config {buildType} --target install -- -j {jobs}".format( jobs=multiprocessing.cpu_count(), **formatVariables ),
+	"if [ -d \"install/{platform}_{buildType}/lib64\" ]; then mv install/{platform}_{buildType}/lib64/* install/{platform}_{buildType}/lib; fi".format( **formatVariables ),
 
 	"cd install/{platform}_{buildType} && "
 	"tar -c -z -f /tmp/intermediate.tar {manifest} && "
