@@ -28,7 +28,11 @@ set( OPENEXR_ROOT_DIR            ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( WITH_CYCLES_CUDA_BINARIES   ON CACHE INTERNAL "" )
 set( WITH_OPENCOLORIO            OFF CACHE INTERNAL "" )
 set( WITH_CYCLES_LOGGING         OFF CACHE INTERNAL "" )
-set( GLEW_ROOT_DIR            ${GAFFER_ROOT} CACHE INTERNAL "" )
+set( GLEW_ROOT_DIR               ${GAFFER_ROOT} CACHE INTERNAL "" )
+set( WITH_CYCLES_OPENVDB         ON CACHE INTERNAL "" )
+set( WITH_OPENVDB_BLOSC          ON CACHE INTERNAL "" )
+set( OPENVDB_ROOT_DIR            ${GAFFER_ROOT} CACHE INTERNAL "" )
+set( TBB_INSTALL_DIR             ${GAFFER_ROOT} CACHE INTERNAL "" )
 add_subdirectory( cycles )
 
 # Cycles Standalone source/headers
@@ -82,6 +86,8 @@ add_definitions(
     -DWITH_OPENCL=1
     -DWITH_CUDA=1
     -DWITH_MULTI=1
+    -DWITH_OPENVDB=1
+    -DWITH_OPENVDB_BLOSC=1
 )
 
 set(CMAKE_CXX_STANDARD 11)
