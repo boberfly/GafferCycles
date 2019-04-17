@@ -73,6 +73,7 @@ find_package(Cortex REQUIRED)
 find_package(OpenEXR REQUIRED Imath)
 find_package(OpenShadingLanguage REQUIRED)
 find_package(Embree "3.5.0" REQUIRED)
+find_package(OpenVDB REQUIRED)
 
 # Cycles defines
 add_definitions(
@@ -107,6 +108,7 @@ set(IECORECYCLES_CXX_FILES
     ${IECORECYCLES_SRC_DIR}/ShaderNetworkAlgo.cpp
     ${IECORECYCLES_SRC_DIR}/SocketAlgo.cpp
     ${IECORECYCLES_SRC_DIR}/Renderer.cpp
+    ${IECORECYCLES_SRC_DIR}/VDBAlgo.cpp
     )
 set(IECORECYCLES_H_FILES
     ${IECORECYCLES_INCLUDE_DIR}/AttributeAlgo.h
@@ -117,6 +119,7 @@ set(IECORECYCLES_H_FILES
     ${IECORECYCLES_INCLUDE_DIR}/ObjectAlgo.h
     ${IECORECYCLES_INCLUDE_DIR}/ShaderNetworkAlgo.h
     ${IECORECYCLES_INCLUDE_DIR}/SocketAlgo.h
+    ${IECORECYCLES_INCLUDE_DIR}/VDBAlgo.h
     )
 # GafferCycles
 set(GAFFERCYCLES_CXX_FILES
@@ -126,6 +129,7 @@ set(GAFFERCYCLES_CXX_FILES
     src/GafferCycles/CyclesOptions.cpp
     src/GafferCycles/CyclesRender.cpp
     src/GafferCycles/CyclesShader.cpp
+    src/GafferCycles/CyclesVDB.cpp
     src/GafferCycles/InteractiveCyclesRender.cpp
     src/GafferCycles/SocketHandler.cpp
     )
@@ -136,6 +140,7 @@ set(GAFFERCYCLES_H_FILES
     include/GafferCycles/CyclesOptions.h
     include/GafferCycles/CyclesRender.h
     include/GafferCycles/CyclesShader.h
+    include/GafferCycles/CyclesVDB.h
     include/GafferCycles/Export.h
     include/GafferCycles/InteractiveCyclesRender.h
     include/GafferCycles/SocketHandler.h
@@ -166,6 +171,7 @@ target_link_libraries(GafferCycles
     ${CYCLES_LIBRARIES} 
     ${OPENSUBDIV_LIBRARIES}
     ${EMBREE_LIBRARIES}
+    ${OPENVDB_LIBRARIES}
     )
 add_dependencies( GafferCycles cycles )
 
