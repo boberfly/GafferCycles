@@ -1,0 +1,5 @@
+# Using a very strange setup of running MSVC 2017 in a Linux container with wine
+
+FROM boberfly/docker-msvc-wine:latest
+
+ENTRYPOINT [ "/usr/bin/entrypoint_msvc" ]

@@ -134,6 +134,16 @@ elif "debug" in args.buildType:
 elif "relWithDebInfo" in args.buildType:
     buildType = "RelWithDebInfo"
 
+cmakeGenerator = "\"Unix Makefiles\""
+dockerFile = "Dockerfile"
+termCmd = "bash"
+pyCmd = "./build.py"
+if "windows" in args.platform:
+    cmakeGenerator = "\"NMake Makefiles JOM\""
+	dockerFile = "Dockerfile.wine"
+	termCmd = "cmd.exe"
+	pyCmd = "python build.py"
+
 if args.interactive :
 	if not args.docker :
 		parser.exit( 1, "--interactive requires --docker\n" )
@@ -162,7 +172,7 @@ formatVariables = {
 	"releaseToken" : os.environ["GITHUB_RELEASE_TOKEN"],
 	"auth" : '-H "Authorization: token {}"'.format( os.environ["GITHUB_RELEASE_TOKEN"] ),
 	"buildType" : buildType,
-	"cmakeGenerator" : "\"Unix Makefiles\"",
+	"cmakeGenerator" : cmakeGenerator,
 	"cxx" : args.forceCxxCompiler,
 	"output" : os.path.abspath( args.output ),
 }
@@ -192,7 +202,7 @@ if args.upload and releaseId() is None :
 
 if args.docker and not os.path.exists( "/.dockerenv" ) :
 
-	imageCommand = "docker build -t gaffercycles-build .".format( **formatVariables )
+	imageCommand = "docker build -f {dockerFile} -t gaffercycles-build .".format( **formatVariables, dockerFile=dockerFile )
 	sys.stderr.write( imageCommand + "\n" )
 	subprocess.check_call( imageCommand, shell = True )
 
@@ -201,9 +211,9 @@ if args.docker and not os.path.exists( "/.dockerenv" ) :
 	containerName = "gaffercycles-build-{id}".format( id = uuid.uuid1() )
 
 	if args.interactive :
-		containerBashCommand = "{env} bash".format( env = containerEnv )
+		containerBashCommand = "{env} {termCmd}".format( env = containerEnv, termCmd = termCmd )
 	else :
-		containerBashCommand = "{env} ./build.py --gafferVersion {gafferVersion} --cyclesVersion {cyclesVersion} --version {version} --upload {upload} --platform {platform} --output=./out".format( env = containerEnv, **formatVariables )
+		containerBashCommand = "{env} {pyCmd} --gafferVersion {gafferVersion} --cyclesVersion {cyclesVersion} --version {version} --upload {upload} --platform {platform} --output=./out".format( pyCmd = pyCmd, env = containerEnv, **formatVariables )
 
 	containerCommand = "docker run --name {name} -i -t gaffercycles-build -c '{command}'".format(
 		name = containerName,
@@ -233,6 +243,9 @@ if not os.path.isdir( formatVariables["output"] ) :
 # Download Gaffer
 
 gafferURL = "https://github.com/GafferHQ/gaffer/releases/download/{gafferVersion}/gaffer-{gafferVersion}-{platform}.tar.gz".format( **formatVariables )
+if platform == "windows" :
+	gafferURL = "https://github.com/hypothetical-inc/gaffer/releases/download/{gafferVersion}-beta/gaffer-{gafferVersion}-{platform}.zip".format( **formatVariables )
+
 sys.stderr.write( "Downloading gaffer \"%s\"\n" % gafferURL )
 
 gafferDirName = "gaffer-{gafferVersion}".format( **formatVariables )
