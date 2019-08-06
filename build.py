@@ -60,7 +60,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument(
 	"--gafferVersion",
-	default = "0.53.4.0",
+	default = "0.54.0.1",
 	help = "The version of Gaffer to build against. "
 )
 
