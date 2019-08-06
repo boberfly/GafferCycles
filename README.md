@@ -37,9 +37,9 @@ Run Gaffer:
 
 `gaffer`
 
-GafferCycles should be stable enough to try out now, I have made builds for Linux under releases. Try 0.3.0 onwards, GPU devices should work but I haven't tested on Nvidia/CUDA yet. OpenCL works.
+GafferCycles should be stable enough to try out now, I have made builds for Linux under releases.
 
-The runtime just needs $GAFFERCYCLES set to the extracted path (so that shaders/kernels can be found) and $GAFFER_EXTENSION_PATHS so that Gaffer will detect GafferCycles.
+Make sure to append where GafferCycles is installed/extracted to by appending to $GAFFER_EXTENSION_PATHS so that Gaffer will detect GafferCycles.
 
 ### Docker Instructions
 
