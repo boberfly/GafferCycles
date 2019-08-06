@@ -140,18 +140,18 @@ termCmd = "bash"
 pyCmd = "./build.py"
 if "windows" in args.platform:
     cmakeGenerator = "\"NMake Makefiles JOM\""
-	dockerFile = "Dockerfile.wine"
-	termCmd = "cmd.exe"
-	pyCmd = "python build.py"
+    dockerFile = "Dockerfile.wine"
+    termCmd = "cmd.exe"
+    pyCmd = "python build.py"
 
 if args.interactive :
-	if not args.docker :
-		parser.exit( 1, "--interactive requires --docker\n" )
-	if args.version or args.upload :
-		parser.exit( 1, "--interactive can not be used with other flags\n" )
+    if not args.docker :
+        parser.exit( 1, "--interactive requires --docker\n" )
+    if args.version or args.upload :
+        parser.exit( 1, "--interactive can not be used with other flags\n" )
 else :
-	if not args.version :
-		parser.exit( "--version argument is required")
+    if not args.version :
+        parser.exit( "--version argument is required")
 
 # Check that our environment contains everything we need to do a build.
 
@@ -202,7 +202,7 @@ if args.upload and releaseId() is None :
 
 if args.docker and not os.path.exists( "/.dockerenv" ) :
 
-	imageCommand = "docker build -f {dockerFile} -t gaffercycles-build .".format( **formatVariables, dockerFile=dockerFile )
+	imageCommand = "docker build -f {dockerFile} -t gaffercycles-build .".format( dockerFile=dockerFile, **formatVariables )
 	sys.stderr.write( imageCommand + "\n" )
 	subprocess.check_call( imageCommand, shell = True )
 
