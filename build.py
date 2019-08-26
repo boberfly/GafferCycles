@@ -60,7 +60,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument(
 	"--gafferVersion",
-	default = "0.54.0.1",
+	default = "0.54.1.0",
 	help = "The version of Gaffer to build against. "
 )
 
@@ -124,6 +124,12 @@ parser.add_argument(
 	help = "The output directory."
 )
 
+parser.add_argument(
+	"--optixPath",
+	default = "optix",
+	help = "Build with OptiX."
+)
+
 args = parser.parse_args()
 
 buildType = ""
@@ -175,6 +181,7 @@ formatVariables = {
 	"cmakeGenerator" : cmakeGenerator,
 	"cxx" : args.forceCxxCompiler,
 	"output" : os.path.abspath( args.output ),
+	"optixPath" : args.optixPath,
 }
 
 packageName = "gafferCycles-{version}-gaffer-{gafferVersion}-{platform}".format( **formatVariables )
@@ -298,6 +305,10 @@ gafferCyclesDirName = os.getcwd()
 
 # Perform the build.
 
+withOptix = "OFF"
+if os.path.isfile( formatVariables["optixPath"] + "/include/optix.h" ) :
+	withOptix = "ON"
+
 manifest = " ".join( [
 	"doc/*",
 	"include/*",
@@ -331,7 +342,9 @@ commands = [
 		" -D CMAKE_BUILD_TYPE={buildType}"
 		" -D GAFFER_ROOT={gafferRoot}"
 		" -D CMAKE_CXX_COMPILER={cxx}"
-		" ../..".format( gafferCyclesRoot=gafferCyclesDirName, gafferRoot=gafferDirName, **formatVariables ),
+		" -D OPTIX_INCLUDE_DIR={optixPath}/include"
+		" -D WITH_CYCLES_DEVICE_OPTIX={withOptix}"
+		" ../..".format( gafferCyclesRoot=gafferCyclesDirName, gafferRoot=gafferDirName, withOptix=withOptix, **formatVariables ),
 
 	"cd build/{platform}_{buildType} && cmake --build . --config {buildType} --target install -- -j {jobs}".format( jobs=multiprocessing.cpu_count(), **formatVariables ),
 	"if [ -d \"install/{platform}_{buildType}/lib64\" ]; then mv install/{platform}_{buildType}/lib64/* install/{platform}_{buildType}/lib; fi".format( **formatVariables ),
