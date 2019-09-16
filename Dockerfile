@@ -81,6 +81,11 @@ RUN yum install -y wget
 RUN wget -O cuda.rpm https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda-repo-rhel7-10-1-local-10.1.105-418.39-1.0-1.x86_64.rpm --progress=dot:mega \
     && rpm -i cuda.rpm && yum install -y cuda && rm cuda.rpm
 
+# OptiX 7.0.0
+
+COPY NVIDIA-OptiX-SDK-7.0.0-linux64.sh /
+RUN mkdir /optix && ./NVIDIA-OptiX-SDK-7.0.0-linux64.sh --skip-license --prefix=/optix --exclude-subdir
+
 # Copy over build script and set an entry point that
 # will use the compiler we want.
 

@@ -125,9 +125,16 @@ parser.add_argument(
 )
 
 parser.add_argument(
-	"--optixPath",
-	default = "optix",
+	"--optix",
+	type = distutils.util.strtobool,
+	default = False,
 	help = "Build with OptiX."
+)
+
+parser.add_argument(
+	"--optixPath",
+	default = "/optix",
+	help = "OptiX path."
 )
 
 args = parser.parse_args()
@@ -181,6 +188,7 @@ formatVariables = {
 	"cmakeGenerator" : cmakeGenerator,
 	"cxx" : args.forceCxxCompiler,
 	"output" : os.path.abspath( args.output ),
+	"optix" : args.optix,
 	"optixPath" : args.optixPath,
 }
 
@@ -220,7 +228,7 @@ if args.docker and not os.path.exists( "/.dockerenv" ) :
 	if args.interactive :
 		containerBashCommand = "{env} {termCmd}".format( env = containerEnv, termCmd = termCmd )
 	else :
-		containerBashCommand = "{env} {pyCmd} --gafferVersion {gafferVersion} --cyclesVersion {cyclesVersion} --version {version} --upload {upload} --platform {platform} --output=./out".format( pyCmd = pyCmd, env = containerEnv, **formatVariables )
+		containerBashCommand = "{env} {pyCmd} --gafferVersion {gafferVersion} --cyclesVersion {cyclesVersion} --version {version} --upload {upload} --platform {platform} --optix {optix} --output=./out".format( pyCmd = pyCmd, env = containerEnv, **formatVariables )
 
 	containerCommand = "docker run --name {name} -i -t gaffercycles-build -c '{command}'".format(
 		name = containerName,
@@ -342,7 +350,7 @@ commands = [
 		" -D CMAKE_BUILD_TYPE={buildType}"
 		" -D GAFFER_ROOT={gafferRoot}"
 		" -D CMAKE_CXX_COMPILER={cxx}"
-		" -D OPTIX_INCLUDE_DIR={optixPath}/include"
+		" -D OPTIX_ROOT_DIR={optixPath}"
 		" -D WITH_CYCLES_DEVICE_OPTIX={withOptix}"
 		" ../..".format( gafferCyclesRoot=gafferCyclesDirName, gafferRoot=gafferDirName, withOptix=withOptix, **formatVariables ),
 

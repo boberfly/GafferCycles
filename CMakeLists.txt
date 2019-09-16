@@ -90,6 +90,10 @@ add_definitions(
     -DWITH_OPENVDB_BLOSC=1
 )
 
+if( WITH_CYCLES_DEVICE_OPTIX )
+    add_definitions( -DWITH_OPTIX=1 )
+endif()
+
 set(CMAKE_CXX_STANDARD 11)
 
 link_directories( ${GAFFER_ROOT}/lib )
