@@ -94,6 +94,10 @@ if( WITH_CYCLES_DEVICE_OPTIX )
     add_definitions( -DWITH_OPTIX=1 )
 endif()
 
+if( WITH_CYCLES_ADAPTIVE_SAMPLING )
+    add_definitions( -DWITH_CYCLES_ADAPTIVE_SAMPLING=1 )
+endif()
+
 set(CMAKE_CXX_STANDARD 11)
 
 link_directories( ${GAFFER_ROOT}/lib )
