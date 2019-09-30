@@ -27,7 +27,7 @@ set( OSL_ROOT_DIR                ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( OPENEXR_ROOT_DIR            ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( WITH_CYCLES_CUDA_BINARIES   ON CACHE INTERNAL "" )
 set( WITH_OPENCOLORIO            OFF CACHE INTERNAL "" )
-set( WITH_CYCLES_LOGGING         OFF CACHE INTERNAL "" )
+set( WITH_CYCLES_LOGGING         ON CACHE INTERNAL "" )
 set( GLEW_ROOT_DIR               ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( WITH_CYCLES_OPENVDB         ON CACHE INTERNAL "" )
 set( WITH_OPENVDB_BLOSC          ON CACHE INTERNAL "" )
@@ -73,6 +73,8 @@ find_package(Cortex REQUIRED)
 find_package(OpenEXR REQUIRED Imath)
 find_package(OpenShadingLanguage REQUIRED)
 find_package(Embree "3.5.0" REQUIRED)
+find_package(Gflags "2.2.2" REQUIRED)
+find_package(Glog "0.4.0" REQUIRED)
 
 # Cycles defines
 add_definitions(
@@ -88,6 +90,7 @@ add_definitions(
     -DWITH_MULTI=1
     -DWITH_OPENVDB=1
     -DWITH_OPENVDB_BLOSC=1
+    -DWITH_CYCLES_LOGGING=1
 )
 
 if( WITH_CYCLES_DEVICE_OPTIX )
@@ -170,6 +173,8 @@ target_link_libraries(GafferCycles
     ${CYCLES_LIBRARIES} 
     ${OPENSUBDIV_LIBRARIES}
     ${EMBREE_LIBRARIES}
+    ${GLOG_LIBRARIES}
+    ${GFLAGS_LIBRARIES}
     )
 add_dependencies( GafferCycles cycles )
 
@@ -187,6 +192,8 @@ set_target_properties(GafferCyclesModule PROPERTIES PREFIX "" OUTPUT_NAME "_Gaff
 target_link_libraries(GafferCyclesModule 
     GafferCycles 
     ${CYCLES_LIBRARIES}
+    ${GLOG_LIBRARIES}
+    ${GFLAGS_LIBRARIES}
     )
 target_include_directories(GafferCyclesModule PRIVATE 
     include ${GAFFER_ROOT}/include 
