@@ -130,6 +130,7 @@ set(GAFFERCYCLES_CXX_FILES
     src/GafferCycles/CyclesAttributes.cpp
     src/GafferCycles/CyclesBackground.cpp
     src/GafferCycles/CyclesLight.cpp
+    src/GafferCycles/CyclesMeshLight.cpp
     src/GafferCycles/CyclesOptions.cpp
     src/GafferCycles/CyclesRender.cpp
     src/GafferCycles/CyclesShader.cpp
@@ -140,6 +141,7 @@ set(GAFFERCYCLES_H_FILES
     include/GafferCycles/CyclesAttributes.h
     include/GafferCycles/CyclesBackground.h
     include/GafferCycles/CyclesLight.h
+    include/GafferCycles/CyclesMeshLight.h
     include/GafferCycles/CyclesOptions.h
     include/GafferCycles/CyclesRender.h
     include/GafferCycles/CyclesShader.h
