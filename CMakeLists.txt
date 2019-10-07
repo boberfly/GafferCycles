@@ -111,6 +111,7 @@ set(IECORECYCLES_CXX_FILES
     ${IECORECYCLES_SRC_DIR}/CurvesAlgo.cpp
     ${IECORECYCLES_SRC_DIR}/MeshAlgo.cpp
     ${IECORECYCLES_SRC_DIR}/ObjectAlgo.cpp
+    ${IECORECYCLES_SRC_DIR}/ParticleAlgo.cpp
     ${IECORECYCLES_SRC_DIR}/ShaderNetworkAlgo.cpp
     ${IECORECYCLES_SRC_DIR}/SocketAlgo.cpp
     ${IECORECYCLES_SRC_DIR}/Renderer.cpp
@@ -122,6 +123,7 @@ set(IECORECYCLES_H_FILES
     ${IECORECYCLES_INCLUDE_DIR}/Export.h
     ${IECORECYCLES_INCLUDE_DIR}/MeshAlgo.h
     ${IECORECYCLES_INCLUDE_DIR}/ObjectAlgo.h
+    ${IECORECYCLES_INCLUDE_DIR}/ParticleAlgo.h
     ${IECORECYCLES_INCLUDE_DIR}/ShaderNetworkAlgo.h
     ${IECORECYCLES_INCLUDE_DIR}/SocketAlgo.h
     )
