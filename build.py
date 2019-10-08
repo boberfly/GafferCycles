@@ -357,7 +357,9 @@ commands = [
 		" ../..".format( gafferCyclesRoot=gafferCyclesDirName, gafferRoot=gafferDirName, withOptix=withOptix, **formatVariables ),
 
 	"cd build/{platform}_{buildType} && cmake --build . --config {buildType} --target install -- -j {jobs}".format( jobs=multiprocessing.cpu_count(), **formatVariables ),
-	"if [ -d \"install/{platform}_{buildType}/lib64\" ]; then mv install/{platform}_{buildType}/lib64/* install/{platform}_{buildType}/lib; fi".format( **formatVariables ),
+	"mv install/{platform}_{buildType}/lib/cmake /tmp/cmake && "
+	"if [ -d \"install/{platform}_{buildType}/lib64\" ]; then mv install/{platform}_{buildType}/lib64/* install/{platform}_{buildType}/lib; fi && "
+	"mv /tmp/cmake/* install/{platform}_{buildType}/lib/cmake".format( **formatVariables ),
 
 	"cd install/{platform}_{buildType} && "
 	"tar -c -z -f /tmp/intermediate.tar {manifest} && "
