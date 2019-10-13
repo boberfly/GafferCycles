@@ -338,7 +338,8 @@ depCommands = [
 	"./build/build.py --project Gflags --gafferRoot {gafferRoot} --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx} && "
 	"./build/build.py --project Glog --gafferRoot {gafferRoot} --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx} && "
 	"./build/build.py --project Embree --gafferRoot {gafferRoot} --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx} && "
-	"./build/build.py --project OpenSubdiv --gafferRoot {gafferRoot} --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx}".format( 
+	"./build/build.py --project OpenSubdiv --gafferRoot {gafferRoot} --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx}"
+	"./build/build.py --project OpenImageDenoise --gafferRoot {gafferRoot} --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx}".format( 
 		gafferCyclesRoot=gafferCyclesDirName, gafferRoot=gafferDirName, **formatVariables ),
 ]
 

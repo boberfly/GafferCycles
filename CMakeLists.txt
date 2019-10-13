@@ -66,6 +66,7 @@ list(APPEND CMAKE_MODULE_PATH
 )
 list(APPEND CMAKE_PREFIX_PATH
     "${CMAKE_INSTALL_PREFIX}/lib/cmake/embree-3.5.0"
+    "${CMAKE_INSTALL_PREFIX}/lib/cmake/OpenImageDenoise"
     "${GAFFER_ROOT}/lib/cmake/embree-3.5.0"
 )
 find_package(OpenSubdiv REQUIRED)
@@ -75,6 +76,7 @@ find_package(OpenShadingLanguage REQUIRED)
 find_package(Embree "3.5.0" REQUIRED)
 find_package(Gflags "2.2.2" REQUIRED)
 find_package(Glog "0.4.0" REQUIRED)
+find_package(OpenImageDenoise "1.0.0" REQUIRED)
 
 # Cycles defines
 add_definitions(
@@ -222,3 +224,61 @@ install(FILES ${GAFFERCYCLES_UI_PY_FILES}
 
 # Startup
 install(DIRECTORY startup DESTINATION .)
+
+# GafferOIDN
+set(GAFFEROIDN_CXX_FILES
+    src/GafferOIDN/Denoise.cpp
+    )
+set(GAFFEROIDN_H_FILES
+    include/GafferOIDN/Denoise.h
+    include/GafferOIDN/Export.h
+    include/GafferOIDN/TypeIds.h
+    )
+
+add_library(GafferOIDN SHARED 
+    ${GAFFEROIDN_CXX_FILES} 
+    ${GAFFEROIDN_H_FILES} 
+    )
+target_include_directories(GafferOIDN PRIVATE 
+    include 
+    ${GAFFER_DEPENDENCIES_ROOT}/include 
+    ${GAFFER_ROOT}/include 
+    ${OPENIMAGEDENOISE_INCLUDE_DIR} 
+    )
+target_link_libraries(GafferOIDN 
+    ${OPENEXR_IMATH_LIBRARY}
+    ${Cortex_IECORE_LIBRARY} 
+    Gaffer
+    GafferImage
+    ${OPENIMAGEDENOISE_LIBRARIES} 
+    )
+
+install(TARGETS GafferOIDN DESTINATION lib)
+install(FILES ${GAFFEROIDN_H_FILES}
+        DESTINATION include/GafferOIDN)
+
+# GafferOIDNModule
+add_library(GafferOIDNModule MODULE 
+    src/GafferOIDNModule/GafferOIDNModule.cpp
+    )
+set_target_properties(GafferOIDNModule PROPERTIES PREFIX "" OUTPUT_NAME "_GafferOIDN" )
+target_link_libraries(GafferOIDNModule 
+    GafferOIDN
+    )
+target_include_directories(GafferOIDNModule PRIVATE 
+    include ${GAFFER_ROOT}/include 
+    ${GAFFER_ROOT}/include/python2.7 
+    )
+
+install(TARGETS GafferOIDNModule DESTINATION python/GafferOIDN)
+
+file(GLOB GAFFEROIDN_PY_FILES python/GafferOIDN/*.py)
+
+install(FILES ${GAFFEROIDN_PY_FILES}
+        DESTINATION python/GafferOIDN)
+
+# GafferOIDNUI
+file(GLOB GAFFEROIDN_UI_PY_FILES python/GafferOIDNUI/*.py)
+
+install(FILES ${GAFFEROIDN_UI_PY_FILES}
+        DESTINATION python/GafferOIDNUI)

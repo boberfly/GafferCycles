@@ -77,3 +77,17 @@ if moduleSearchPath.find( "GafferCycles" ) :
 
 		stacktrace = traceback.format_exc()
 		IECore.msg( IECore.Msg.Level.Error, "startup/gui/menus.py", "Error loading Cycles module - \"%s\".\n %s" % ( m, stacktrace ) )
+
+if moduleSearchPath.find( "GafferOIDN" ) :
+
+	try :
+
+		import GafferOIDN
+		import GafferOIDNUI
+
+		nodeMenu.append( "/OIDN/Denoise", GafferOIDNUI.DenoiseUI.nodeMenuCreateCommand, searchText = "OIDNDenoise" )
+
+	except Exception, m :
+
+		stacktrace = traceback.format_exc()
+		IECore.msg( IECore.Msg.Level.Error, "startup/gui/menus.py", "Error loading OIDN module - \"%s\".\n %s" % ( m, stacktrace ) )
