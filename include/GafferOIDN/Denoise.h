@@ -58,6 +58,15 @@ class GAFFEROIDN_API Denoise : public GafferImage::ImageProcessor
 
 		GAFFER_GRAPHCOMPONENT_DECLARE_TYPE( GafferOIDN::Denoise, GafferOIDN::DenoiseTypeId, GafferImage::ImageProcessor );
 
+		Gaffer::IntPlug *verbosePlug();
+		const Gaffer::IntPlug *verbosePlug() const;
+
+		Gaffer::IntPlug *numThreadsPlug();
+		const Gaffer::IntPlug *numThreadsPlug() const;
+
+		Gaffer::BoolPlug *setAffinityPlug();
+		const Gaffer::BoolPlug *setAffinityPlug() const;
+
 		Gaffer::IntPlug *deviceTypePlug();
 		const Gaffer::IntPlug *deviceTypePlug() const;
 		
@@ -73,14 +82,40 @@ class GAFFEROIDN_API Denoise : public GafferImage::ImageProcessor
 		Gaffer::StringPlug *normalPlug();
 		const Gaffer::StringPlug *normalPlug() const;
 
+		Gaffer::BoolPlug *hdrPlug();
+		const Gaffer::BoolPlug *hdrPlug() const;
+
+		Gaffer::FloatPlug *hdrScalePlug();
+		const Gaffer::FloatPlug *hdrScalePlug() const;
+
+		Gaffer::BoolPlug *srgbPlug();
+		const Gaffer::BoolPlug *srgbPlug() const;
+
+		Gaffer::IntPlug *maxMemoryMBPlug();
+		const Gaffer::IntPlug *maxMemoryMBPlug() const;
+
 		void affects( const Gaffer::Plug *input, AffectedPlugsContainer &outputs ) const override;
 
 	protected :
 
 		void hash( const Gaffer::ValuePlug *output, const Gaffer::Context *context, IECore::MurmurHash &h ) const override;
+		void hashChannelData( const GafferImage::ImagePlug *output, const Gaffer::Context *context, IECore::MurmurHash &h ) const override;
+
+		/// Implemented to process the color data and stash the results on colorDataPlug()
+		/// format, dataWindow, metadata, and channelNames are passed through via direct connection to the input values.
 		void compute( Gaffer::ValuePlug *output, const Gaffer::Context *context ) const override;
+		Gaffer::ValuePlug::CachePolicy computeCachePolicy( const Gaffer::ValuePlug *output ) const override;
+
+		/// Implemented to use the results of colorDataPlug() via compute()
+		IECore::ConstFloatVectorDataPtr computeChannelData( const std::string &channelName, const Imath::V2i &tileOrigin, const Gaffer::Context *context, const GafferImage::ImagePlug *parent ) const override;
 
 	private :
+
+		// Used to store the result of compute(), so that it can be reused in computeChannelData().
+		// Evaluated in a context with an "image:colorProcessor:__layerName" variable, so we can cache
+		// different results per layer.
+		Gaffer::ObjectPlug *colorDataPlug();
+		const Gaffer::ObjectPlug *colorDataPlug() const;
 
 		static size_t g_firstPlugIndex;
 

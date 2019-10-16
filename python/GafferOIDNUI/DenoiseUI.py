@@ -56,6 +56,49 @@ Gaffer.Metadata.registerNode(
 
 	plugs = {
 
+		"verbose" : [
+
+			"description",
+			"""
+			Verbosity level of the console output between 0-3; when set to 0, no output is
+			printed, when set to a higher level more output is printed.
+			""",
+
+			"preset:No Output", 0,
+			"preset:1", 1,
+			"preset:2", 2,
+			"preset:3", 3,
+
+			"plugValueWidget:type", "GafferUI.PresetsPlugValueWidget",
+
+			"layout:section", "Device",
+
+		],
+
+		"numThreads" : [
+
+			"description",
+			"""
+			Maximum number of threads which the library should use; 0 will set it automatically 
+			to get the best performance.
+			""",
+
+			"layout:section", "Device",
+
+		],
+
+		"setAffinity" : [
+
+			"description",
+			"""
+			Bind software threads to hardware threads if set to true (improves performance); 
+			false disables binding.
+			""",
+
+			"layout:section", "Device",
+
+		],
+
 		"deviceType" : [
 
 			"description",
@@ -69,6 +112,8 @@ Gaffer.Metadata.registerNode(
 
 			"plugValueWidget:type", "GafferUI.PresetsPlugValueWidget",
 
+			"layout:section", "Device",
+
 		],
 
 		"filterType" : [
@@ -77,6 +122,7 @@ Gaffer.Metadata.registerNode(
 			"""
 			The filter type to use.
 
+			RT
 			The RT (ray tracing) filter is a generic ray tracing denoising filter which 
 			is suitable for denoising images rendered with Monte Carlo ray tracing methods 
 			like unidirectional and bidirectional path tracing. It supports depth of field 
@@ -99,9 +145,14 @@ Gaffer.Metadata.registerNode(
 			Weighted pixel sampling (sometimes called splatting) introduces correlation 
 			between neighboring pixels, which causes the denoising to fail (the noise will 
 			not be filtered), thus it is not supported.
+
+			RTLightmap
+			The RTLightmap filter is a variant of the RT filter optimized for denoising HDR 
+			lightmaps. It does not support LDR images.
 			""",
 
 			"preset:RT", "RT",
+			"preset:RTLightmap", "RTLightmap",
 
 			"plugValueWidget:type", "GafferUI.PresetsPlugValueWidget",
 
@@ -117,12 +168,47 @@ Gaffer.Metadata.registerNode(
 
 		],
 
+		"hdr" : [
+
+			"description",
+			"""
+			Whether the color is HDR. Always on for RTLightmap.
+			""",
+
+		],
+
+		"hdrScale" : [
+
+			"description",
+			"""
+			HDR color values are interpreted such that, multiplied by this scale, a value 
+			of 1 corresponds to a luminance level of 100 cd/m^2 (this affects the quality 
+			of the output but the output color values will not be scaled); if set to NaN, 
+			the scale is computed automatically (default).
+			""",
+
+		],
+
+		"maxMemoryMB" : [
+
+			"description",
+			"""
+			Approximate maximum amount of scratch memory to use in megabytes (actual 
+			memory usage may be higher); limiting memory usage may cause slower denoising 
+			due to internally splitting the image into overlapping tiles, but cannot cause 
+			the denoising to fail.
+			"""
+
+		],
+
 		"albedo" : [
 
 			"description",
 			"""
 			The albedo pass to use (optional).
-			"""
+			""",
+
+			"layout:section", "RT",
 
 		],
 
@@ -131,7 +217,9 @@ Gaffer.Metadata.registerNode(
 			"description",
 			"""
 			The normal pass to use (optional).
-			"""
+			""",
+
+			"layout:section", "RT",
 
 		],
 
