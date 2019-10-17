@@ -117,6 +117,10 @@ bool deinterleave(
 	std::vector<float> &g = gd->writable();
 	std::vector<float> &b = bd->writable();
 
+	r.resize( width * height );
+	g.resize( width * height );
+	b.resize( width * height );
+
 	const std::vector<float> &d = data->readable();
 
 	unsigned int i = 0;
@@ -167,7 +171,7 @@ Denoise::Denoise( const std::string &name )
 	addChild( new StringPlug( "normal", Gaffer::Plug::In, g_normalLayerName ) );
 
 	addChild( new BoolPlug( "hdr", Gaffer::Plug::In, true ) );
-	addChild( new FloatPlug( "hdrScale", Gaffer::Plug::In, NAN ) );
+	addChild( new FloatPlug( "hdrScale", Gaffer::Plug::In, 0.0f ) );
 	addChild( new BoolPlug( "srgb", Gaffer::Plug::In, false ) );
 	addChild( new IntPlug( "maxMemoryMB", Gaffer::Plug::In, 6000 ) );
 
@@ -316,7 +320,9 @@ void Denoise::affects( const Gaffer::Plug *input, AffectedPlugsContainer &output
 {
 	ImageProcessor::affects( input, outputs );
 
-	if( input == inPlug()->channelDataPlug() ||
+	if( 
+		input == inPlug()->channelDataPlug() ||
+		input == inPlug()->channelNamesPlug() ||
 		input == deviceTypePlug() ||
 		input == filterTypePlug() ||
 		input == channelsPlug() ||
@@ -324,11 +330,15 @@ void Denoise::affects( const Gaffer::Plug *input, AffectedPlugsContainer &output
 		input == normalPlug() ||
 		input == hdrPlug() ||
 		input == hdrScalePlug() ||
-		input == srgbPlug() )
+		input == srgbPlug() 
+	)
 	{
 		outputs.push_back( colorDataPlug() );
 	}
-	else if( input == colorDataPlug() )
+	else if( 
+		input == channelsPlug() ||
+		input == colorDataPlug() 
+	)
 	{
 		outputs.push_back( outPlug()->channelDataPlug() );
 	}
@@ -340,7 +350,26 @@ void Denoise::hash( const ValuePlug *output, const Gaffer::Context *context, IEC
 
 	if( output == colorDataPlug() )
 	{
-		inPlug()->channelDataPlug()->hash( h );
+		ConstStringVectorDataPtr channelNamesData;
+		{
+			ImagePlug::GlobalScope globalScope( context );
+			channelNamesData = inPlug()->channelNamesPlug()->getValue();
+		}
+		const vector<string> &channelNames = channelNamesData->readable();
+
+		const string &layerName = context->get<string>( g_layerNameKey );
+		{
+			ImagePlug::GlobalScope globalScope( context );
+			int i = 0;
+			for( const auto &baseName : { "R", "G", "B" } )
+			{
+				string channelName = ImageAlgo::channelName( layerName, baseName );
+				if( ImageAlgo::channelExists( channelNames, channelName ) )
+				{
+					inPlug()->image()->getChannel<float>( channelName )->hash( h );
+				}
+			}
+		}
 
 		deviceTypePlug()->hash( h );
 		filterTypePlug()->hash( h );
@@ -350,8 +379,9 @@ void Denoise::hash( const ValuePlug *output, const Gaffer::Context *context, IEC
 		normalPlug()->hash( h );
 
 		hdrPlug()->hash( h );
-		hdrScalePlug()->hash( h );
+		//hdrScalePlug()->hash( h );
 		srgbPlug()->hash( h );
+
 	}
 }
 
@@ -380,21 +410,16 @@ void Denoise::compute( ValuePlug *output, const Context *context ) const
 
 		const string &layerName = context->get<string>( g_layerNameKey );
 
-		IECore::FloatVectorDataPtr rgb[3];
+		IECore::FloatVectorDataPtr colorIn[3];
 		{
-			ImagePlug::ChannelDataScope channelDataScope( context );
+			ImagePlug::GlobalScope globalScope( context );
 			int i = 0;
 			for( const auto &baseName : { "R", "G", "B" } )
 			{
 				string channelName = ImageAlgo::channelName( layerName, baseName );
 				if( ImageAlgo::channelExists( channelNames, channelName ) )
 				{
-					channelDataScope.setChannelName( channelName );
-					rgb[i] = inPlug()->channelDataPlug()->getValue()->copy();
-				}
-				else
-				{
-					rgb[i] = ImagePlug::blackTile()->copy();
+					colorIn[i] = inPlug()->image()->getChannel<float>( channelName );
 				}
 				i++;
 			}
@@ -402,52 +427,53 @@ void Denoise::compute( ValuePlug *output, const Context *context ) const
 
 		int width = inPlug()->format().width();
 		int height = inPlug()->format().height();
-		int size = width * height * 3; // 3-channel
 
 		bool hasAlbedo = false;
-		IECore::FloatVectorDataPtr albedo[3];
+		IECore::FloatVectorDataPtr albedoIn[3];
 		IECore::FloatVectorDataPtr albedoData = new IECore::FloatVectorData();
 		if( filterType == g_RTFilterName )
 		{
-			ImagePlug::ChannelDataScope channelDataScope( context );
+			ImagePlug::GlobalScope globalScope( context );
 			int i = 0;
 			for( const auto &baseName : { "R", "G", "B" } )
 			{
 				string channelName = ImageAlgo::channelName( albedoPlug()->getValue(), baseName );
 				if( ImageAlgo::channelExists( channelNames, channelName ) )
 				{
-					channelDataScope.setChannelName( channelName );
-					albedo[i] = inPlug()->channelDataPlug()->getValue()->copy(); // revisit
+					albedoIn[i] = inPlug()->image()->getChannel<float>( channelName );
 				}
+				i++;
 			}
-			hasAlbedo = interleave( albedo[0].get(), albedo[1].get(), albedo[2].get(), width, height, albedoData );
+			hasAlbedo = interleave( albedoIn[0].get(), albedoIn[1].get(), albedoIn[2].get(), width, height, albedoData );
 		}
 
 		bool hasNormal = false;
-		IECore::FloatVectorDataPtr normal[3];
+		IECore::FloatVectorDataPtr normalIn[3];
 		IECore::FloatVectorDataPtr normalData = new IECore::FloatVectorData();
 		if( filterType == g_RTFilterName )
 		{
-			ImagePlug::ChannelDataScope channelDataScope( context );
+			ImagePlug::GlobalScope globalScope( context );
 			int i = 0;
-			for( const auto &baseName : { "X", "Y", "Z" } )
+			for( const auto &baseName : { "R", "G", "B" } )
 			{
 				string channelName = ImageAlgo::channelName( normalPlug()->getValue(), baseName );
 				if( ImageAlgo::channelExists( channelNames, channelName ) )
 				{
-					channelDataScope.setChannelName( channelName );
-					normal[i] = inPlug()->channelDataPlug()->getValue()->copy(); // revisit
+					normalIn[i] = inPlug()->image()->getChannel<float>( channelName );
 				}
+				i++;
 			}
-			hasNormal = interleave( normal[0].get(), normal[1].get(), normal[2].get(), width, height, normalData );
+			hasNormal = interleave( normalIn[0].get(), normalIn[1].get(), normalIn[2].get(), width, height, normalData );
 		}
 
 		IECore::FloatVectorDataPtr outputData = new IECore::FloatVectorData();
 		IECore::FloatVectorDataPtr colorData = new IECore::FloatVectorData();
-		if( interleave( rgb[0].get(), rgb[1].get(), rgb[2].get(), width, height, colorData ) )
+		IECore::FloatVectorDataPtr colorOut[3] = new IECore::FloatVectorData();
+
+		if( interleave( colorIn[0].get(), colorIn[1].get(), colorIn[2].get(), width, height, colorData ) )
 		{
-			std::vector<float> &colorOutput = outputData->writable();
-			colorOutput.resize( size );
+			std::vector<float> &output = outputData->writable();
+			output.resize( width * height );
 
 			std::vector<float> &color = colorData->writable(); // readable
 			std::vector<float> &albedo = albedoData->writable(); // readable
@@ -463,7 +489,7 @@ void Denoise::compute( ValuePlug *output, const Context *context ) const
 			if( hasNormal )
 				filter.setImage( "normal", &normal[0], oidn::Format::Float3, width, height );
 
-			filter.setImage( "output", &colorOutput[0], oidn::Format::Float3, width, height );
+			filter.setImage( "output", &output[0], oidn::Format::Float3, width, height );
 
 			if( filterType == g_RTFilterName )
 			{
@@ -471,19 +497,25 @@ void Denoise::compute( ValuePlug *output, const Context *context ) const
 				filter.set( "srgb", srgbPlug()->getValue() );
 			}
 
-			//filter.set( "hdrScale", hdrScalePlug()->getValue() );
+			// OIDN 1.1.0
+			//float hdrScale = hdrScalePlug()->getValue();
+			//if( hdrScale > 0.0f )
+			//filter.set( "hdrScale", hdrScale );
 			filter.set( "maxMemoryMB", maxMemoryMBPlug()->getValue() );
 
 			filter.commit();
 			filter.execute();
 
-			deinterleave( rgb[0].get(), rgb[1].get(), rgb[2].get(), width, height, outputData );
+			deinterleave( colorOut[0].get(), colorOut[1].get(), colorOut[2].get(), width, height, outputData );
 		}
 
+		//interleave( colorIn[0].get(), colorIn[1].get(), colorIn[2].get(), width, height, colorData );
+		//deinterleave( colorOut[0].get(), colorOut[1].get(), colorOut[2].get(), width, height, colorData );
+
 		IECore::ObjectVectorPtr result = new IECore::ObjectVector();
-		result->members().push_back( rgb[0] );
-		result->members().push_back( rgb[1] );
-		result->members().push_back( rgb[2] );
+		result->members().push_back( colorOut[0] );
+		result->members().push_back( colorOut[1] );
+		result->members().push_back( colorOut[2] );
 
 		static_cast<ObjectPlug *>( output )->setValue( result );
 		return;
@@ -551,5 +583,5 @@ IECore::ConstFloatVectorDataPtr Denoise::computeChannelData( const std::string &
 		layerScope.set( g_layerNameKey, ImageAlgo::layerName( channel ) );
 		colorData = boost::static_pointer_cast<const ObjectVector>( colorDataPlug()->getValue() );
 	}
-	return boost::static_pointer_cast<const FloatVectorData>( colorData->members()[ImageAlgo::colorIndex( baseName)] );
+	return boost::static_pointer_cast<const FloatVectorData>( colorData->members()[ImageAlgo::colorIndex( baseName )] );
 }
