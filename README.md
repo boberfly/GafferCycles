@@ -12,8 +12,12 @@ for the optional dependencies OpenSubdiv and Embree.
 * Gaffer Install from GafferHQ
 * (optional)OpenSubdiv
 * (optional)Embree
+* (optional)OptiX
+* (optional)Gflags+Glog
 
-**In a terminal (Linux):**
+Check Optional dependency install down below for easy python scripts
+
+**In a terminal (Linux/Ubuntu):**
 ```
 export GAFFER_ROOT=<gaffer install path>
 export GAFFERCYCLES=<install destination>
@@ -26,6 +30,21 @@ cd build
 cmake -DCMAKE_CXX_COMPILER=g++-6 -DGAFFER_ROOT=$GAFFER_ROOT -DCMAKE_INSTALL_PREFIX=$GAFFERCYCLES ..
 make install -j <num cores>
 ```
+
+**Optional dependencies+install:**
+
+Run this after cloning the git repo and before building
+```
+cd dependencies
+python ./build/build.py --project Gflags --buildDir $GAFFERCYCLES --forceCCompiler gcc-6 --forceCxxCompiler g++-6
+python ./build/build.py --project Glog --buildDir $GAFFERCYCLES --forceCCompiler gcc-6 --forceCxxCompiler g++-6
+python ./build/build.py --project Embree --buildDir $GAFFERCYCLES --forceCCompiler gcc-6 --forceCxxCompiler g++-6
+python ./build/build.py --project OpenSubdiv --buildDir $GAFFERCYCLES --forceCCompiler gcc-6 --forceCxxCompiler g++-6
+cd ../build
+cmake -DCMAKE_CXX_COMPILER=g++-6 -DGAFFER_ROOT=$GAFFER_ROOT -DCMAKE_INSTALL_PREFIX=$GAFFERCYCLES -DWITH_CYCLES_EMBREE=ON -DWITH_CYCLES_OPENSUBDIV=ON -DWITH_CYCLES_LOGGING=ON ..
+make install -j <num cores>
+```
+For OptiX, it will need to be installed from Nvidia's website and ```-DWITH_CYCLES_DEVICE_OPTIX=ON -DOPTIX_ROOT_DIR=$OPTIX_ROOT``` added to the cmake line.
 
 ### Runtime Instructions
 

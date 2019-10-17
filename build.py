@@ -355,6 +355,9 @@ commands = [
 		" -D CMAKE_CXX_COMPILER={cxx}"
 		" -D OPTIX_ROOT_DIR={optixPath}"
 		" -D WITH_CYCLES_DEVICE_OPTIX={withOptix}"
+		" -D WITH_CYCLES_EMBREE=ON"
+		" -D WITH_CYCLES_OPENSUBDIV=ON"
+		" -D WITH_CYCLES_LOGGING=ON"
 		" ../..".format( gafferCyclesRoot=gafferCyclesDirName, gafferRoot=gafferDirName, withOptix=withOptix, **formatVariables ),
 
 	"cd build/{platform}_{buildType} && cmake --build . --config {buildType} --target install -- -j {jobs}".format( jobs=multiprocessing.cpu_count(), **formatVariables ),
