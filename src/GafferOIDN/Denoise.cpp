@@ -38,6 +38,7 @@
 
 #include "GafferImage/ImageAlgo.h"
 
+#include "IECore/MessageHandler.h"
 #include "IECore/SimpleTypedData.h"
 #include "IECore/VectorTypedData.h"
 
@@ -335,10 +336,7 @@ void Denoise::affects( const Gaffer::Plug *input, AffectedPlugsContainer &output
 	{
 		outputs.push_back( colorDataPlug() );
 	}
-	else if( 
-		input == channelsPlug() ||
-		input == colorDataPlug() 
-	)
+	else if( input == colorDataPlug() )
 	{
 		outputs.push_back( outPlug()->channelDataPlug() );
 	}
@@ -467,17 +465,17 @@ void Denoise::compute( ValuePlug *output, const Context *context ) const
 		}
 
 		IECore::FloatVectorDataPtr outputData = new IECore::FloatVectorData();
-		IECore::FloatVectorDataPtr colorData = new IECore::FloatVectorData();
+		IECore::FloatVectorDataPtr colorInData = new IECore::FloatVectorData();
 		IECore::FloatVectorDataPtr colorOut[3] = new IECore::FloatVectorData();
 
-		if( interleave( colorIn[0].get(), colorIn[1].get(), colorIn[2].get(), width, height, colorData ) )
+		if( interleave( colorIn[0].get(), colorIn[1].get(), colorIn[2].get(), width, height, colorInData ) )
 		{
 			std::vector<float> &output = outputData->writable();
-			output.resize( width * height );
+			output.resize( width * height * 3 );
 
-			std::vector<float> &color = colorData->writable(); // readable
-			std::vector<float> &albedo = albedoData->writable(); // readable
-			std::vector<float> &normal = normalData->writable(); // readable
+			std::vector<float> &color = colorInData->writable(); // readable, but oidn wants a non-const ptr
+			std::vector<float> &albedo = albedoData->writable(); // readable, but oidn wants a non-const ptr
+			std::vector<float> &normal = normalData->writable(); // readable, but oidn wants a non-const ptr
 
 			oidn::FilterRef filter = device.newFilter( filterTypePlug()->getValue().c_str() );
 
@@ -506,11 +504,12 @@ void Denoise::compute( ValuePlug *output, const Context *context ) const
 			filter.commit();
 			filter.execute();
 
+			const char* errorMessage;
+			if( device.getError( errorMessage ) != oidn::Error::None )
+				IECore::msg( IECore::Msg::Error, "GafferOIDN::Denoise", boost::format( "%s" ) % errorMessage );
+
 			deinterleave( colorOut[0].get(), colorOut[1].get(), colorOut[2].get(), width, height, outputData );
 		}
-
-		//interleave( colorIn[0].get(), colorIn[1].get(), colorIn[2].get(), width, height, colorData );
-		//deinterleave( colorOut[0].get(), colorOut[1].get(), colorOut[2].get(), width, height, colorData );
 
 		IECore::ObjectVectorPtr result = new IECore::ObjectVector();
 		result->members().push_back( colorOut[0] );
@@ -533,6 +532,13 @@ Gaffer::ValuePlug::CachePolicy Denoise::computeCachePolicy( const Gaffer::ValueP
 		// just copying data out of our intermediate colorDataPlug(), it is
 		// actually quicker not to cache the result.
 		return ValuePlug::CachePolicy::Uncached;
+	}
+	else if( output == colorDataPlug() )
+	{
+		// This is so when we generate colorData from OpenImageDenoise,
+		// it runs on a single-thread and the library will multi-thread
+		// internally using TBB.
+		return ValuePlug::CachePolicy::TaskCollaboration;
 	}
 	return ImageProcessor::computeCachePolicy( output );
 }
