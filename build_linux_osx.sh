@@ -8,8 +8,8 @@ if [[ -z "${GAFFER_ROOT}" ]]; then
 fi
 
 # Packaging variables
-VERSION=0.9.1
-GAFFERVERSION=0.54.1.0
+VERSION=0.10.0
+GAFFERVERSION=0.54.2.0
 
 if [[ -z "${GAFFER_BUILD_TYPE}" ]]; then
     echo "WARNING : GAFFER_BUILD_TYPE environment variable not set, defaulting to release"
