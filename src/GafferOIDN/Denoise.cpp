@@ -36,6 +36,7 @@
 
 #include "GafferOIDN/Denoise.h"
 
+#include "GafferImage/BufferAlgo.h"
 #include "GafferImage/ImageAlgo.h"
 
 #include "IECore/MessageHandler.h"
@@ -348,6 +349,7 @@ void Denoise::hash( const ValuePlug *output, const Gaffer::Context *context, IEC
 
 	if( output == colorDataPlug() )
 	{
+		IECoreImage::ImagePrimitivePtr image = inPlug()->image();
 		ConstStringVectorDataPtr channelNamesData;
 		{
 			ImagePlug::GlobalScope globalScope( context );
@@ -364,7 +366,7 @@ void Denoise::hash( const ValuePlug *output, const Gaffer::Context *context, IEC
 				string channelName = ImageAlgo::channelName( layerName, baseName );
 				if( ImageAlgo::channelExists( channelNames, channelName ) )
 				{
-					inPlug()->image()->getChannel<float>( channelName )->hash( h );
+					image->getChannel<float>( channelName )->hash( h );
 				}
 			}
 		}
@@ -408,6 +410,8 @@ void Denoise::compute( ValuePlug *output, const Context *context ) const
 
 		const string &layerName = context->get<string>( g_layerNameKey );
 
+		IECoreImage::ImagePrimitivePtr image = inPlug()->image();
+
 		IECore::FloatVectorDataPtr colorIn[3];
 		{
 			ImagePlug::GlobalScope globalScope( context );
@@ -417,7 +421,7 @@ void Denoise::compute( ValuePlug *output, const Context *context ) const
 				string channelName = ImageAlgo::channelName( layerName, baseName );
 				if( ImageAlgo::channelExists( channelNames, channelName ) )
 				{
-					colorIn[i] = inPlug()->image()->getChannel<float>( channelName );
+					colorIn[i] = image->getChannel<float>( channelName );
 				}
 				i++;
 			}
@@ -438,7 +442,7 @@ void Denoise::compute( ValuePlug *output, const Context *context ) const
 				string channelName = ImageAlgo::channelName( albedoPlug()->getValue(), baseName );
 				if( ImageAlgo::channelExists( channelNames, channelName ) )
 				{
-					albedoIn[i] = inPlug()->image()->getChannel<float>( channelName );
+					albedoIn[i] = image->getChannel<float>( channelName );
 				}
 				i++;
 			}
@@ -457,7 +461,7 @@ void Denoise::compute( ValuePlug *output, const Context *context ) const
 				string channelName = ImageAlgo::channelName( normalPlug()->getValue(), baseName );
 				if( ImageAlgo::channelExists( channelNames, channelName ) )
 				{
-					normalIn[i] = inPlug()->image()->getChannel<float>( channelName );
+					normalIn[i] = image->getChannel<float>( channelName );
 				}
 				i++;
 			}
@@ -468,6 +472,7 @@ void Denoise::compute( ValuePlug *output, const Context *context ) const
 		IECore::FloatVectorDataPtr colorInData = new IECore::FloatVectorData();
 		IECore::FloatVectorDataPtr colorOut[3] = new IECore::FloatVectorData();
 
+		/*
 		if( interleave( colorIn[0].get(), colorIn[1].get(), colorIn[2].get(), width, height, colorInData ) )
 		{
 			std::vector<float> &output = outputData->writable();
@@ -510,6 +515,12 @@ void Denoise::compute( ValuePlug *output, const Context *context ) const
 
 			deinterleave( colorOut[0].get(), colorOut[1].get(), colorOut[2].get(), width, height, outputData );
 		}
+		*/
+
+		colorOut[0] = colorIn[0]->copy();
+		colorOut[1] = colorIn[1]->copy();
+		colorOut[2] = colorIn[2]->copy();
+
 
 		IECore::ObjectVectorPtr result = new IECore::ObjectVector();
 		result->members().push_back( colorOut[0] );
@@ -589,5 +600,37 @@ IECore::ConstFloatVectorDataPtr Denoise::computeChannelData( const std::string &
 		layerScope.set( g_layerNameKey, ImageAlgo::layerName( channel ) );
 		colorData = boost::static_pointer_cast<const ObjectVector>( colorDataPlug()->getValue() );
 	}
-	return boost::static_pointer_cast<const FloatVectorData>( colorData->members()[ImageAlgo::colorIndex( baseName )] );
+
+	ConstFloatVectorDataPtr channelColorData = boost::static_pointer_cast<const FloatVectorData>( colorData->members()[ImageAlgo::colorIndex( baseName )] );
+	const vector<float> &colorChannel = channelColorData->readable();
+
+	int width = inPlug()->format().width();
+	int height = inPlug()->format().height();
+
+	Box2i channelDataRegion( V2i( 0, 0 ), V2i( width - 1, height - 1 ) );
+
+	FloatVectorDataPtr tileData = new IECore::FloatVectorData(
+		std::vector<float>( ImagePlug::tileSize()*ImagePlug::tileSize() )
+	);
+	vector<float> &tile = tileData->writable();
+
+	Box2i tileRegion = BufferAlgo::intersection(
+		Box2i( V2i( tileOrigin.x, tileOrigin.y ), V2i( tileOrigin.x + ImagePlug::tileSize(), tileOrigin.y + ImagePlug::tileSize() ) ), channelDataRegion
+	);
+	unsigned int i = 0;
+	//for( int y = tileRegion.min.y; y < tileRegion.max.y; ++y, ++i )
+	for( int y = tileRegion.max.y - 1; y >= tileRegion.min.y; --y, ++i )
+	{
+		float *tileIndex = &tile[ i * ImagePlug::tileSize() ];// + tileRegion.min.x ];
+		const float *dataIndex = &colorChannel[ y * width + tileRegion.min.x ];
+		unsigned int j = 0;
+		for( int x = tileRegion.min.x; x < tileRegion.max.x; x++, j++ )
+		{
+            *tileIndex = dataIndex[j];
+			++tileIndex;
+		}
+	}
+
+	return tileData;
+
 }
