@@ -72,6 +72,7 @@ find_package(Cortex REQUIRED)
 find_package(OpenEXR REQUIRED Imath)
 find_package(OpenShadingLanguage REQUIRED)
 find_package(Embree "3.5.0" REQUIRED)
+find_package(OpenVDB REQUIRED)
 find_package(Gflags "2.2.2" REQUIRED)
 find_package(Glog "0.4.0" REQUIRED)
 
@@ -123,6 +124,7 @@ set(IECORECYCLES_CXX_FILES
     ${IECORECYCLES_SRC_DIR}/ShaderNetworkAlgo.cpp
     ${IECORECYCLES_SRC_DIR}/SocketAlgo.cpp
     ${IECORECYCLES_SRC_DIR}/Renderer.cpp
+    ${IECORECYCLES_SRC_DIR}/VDBAlgo.cpp
     )
 set(IECORECYCLES_H_FILES
     ${IECORECYCLES_INCLUDE_DIR}/AttributeAlgo.h
@@ -134,6 +136,7 @@ set(IECORECYCLES_H_FILES
     ${IECORECYCLES_INCLUDE_DIR}/ParticleAlgo.h
     ${IECORECYCLES_INCLUDE_DIR}/ShaderNetworkAlgo.h
     ${IECORECYCLES_INCLUDE_DIR}/SocketAlgo.h
+    ${IECORECYCLES_INCLUDE_DIR}/VDBAlgo.h
     )
 # GafferCycles
 set(GAFFERCYCLES_CXX_FILES
@@ -185,6 +188,7 @@ target_link_libraries(GafferCycles
     ${CYCLES_LIBRARIES} 
     ${OPENSUBDIV_LIBRARIES}
     ${EMBREE_LIBRARIES}
+    ${OPENVDB_LIBRARIES}
     ${GLOG_LIBRARIES}
     ${GFLAGS_LIBRARIES}
     )
