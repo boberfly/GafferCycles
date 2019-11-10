@@ -647,7 +647,7 @@ class RenderCallback : public IECore::RefCounted
 			if(!buffers->copy_from_device())
 				return;
 
-			//float exposure = m_session->scene->film->exposure;
+			const float exposure = m_session->scene->film->exposure;
 
 			const int numOutputChannels = m_interactive ? m_displayDriver->channelNames().size() : 1;
 
@@ -677,13 +677,13 @@ class RenderCallback : public IECore::RefCounted
 				int numChannels = output.second->m_components;
 				if( output.second->m_passType != ccl::PASS_NONE )
 				{
-					read = buffers->get_pass_rect( output.second->m_passType, 0.5f, sample, numChannels, &tileData[0], output.second->m_data.c_str() );
+					read = buffers->get_pass_rect( output.second->m_passType, exposure, sample, numChannels, &tileData[0], output.second->m_data.c_str() );
 				}
 				else
 				{
 					if( output.second->m_denoisingPassOffsets >= 0 )
 					{
-						read = buffers->get_denoising_pass_rect( output.second->m_denoisingPassOffsets, 0.5f, sample, numChannels, &tileData[0] );
+						read = buffers->get_denoising_pass_rect( output.second->m_denoisingPassOffsets, exposure, sample, numChannels, &tileData[0] );
 					}
 				}
 
@@ -815,7 +815,7 @@ class ShaderCache : public IECore::RefCounted
 					ccl::GeometryNode *geo = new ccl::GeometryNode();
 					ccl::MathNode *math = new ccl::MathNode();
 					math->type = ccl::NODE_MATH_MULTIPLY;
-					math->value2 = 2.0f;
+					math->value2 = 1.0f;
 					ccl::ShaderNode *vecMathNode = cshader->graph->add( (ccl::ShaderNode*)vecMath );
 					ccl::ShaderNode *geoNode = cshader->graph->add( (ccl::ShaderNode*)geo );
 					ccl::ShaderNode *mathNode = cshader->graph->add( (ccl::ShaderNode*)math );
