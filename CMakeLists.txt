@@ -15,8 +15,8 @@ add_compile_options("$<$<CONFIG:DEBUG>:-DWITH_CYCLES_DEBUG=1>")
 set( WITH_CYCLES_STANDALONE_GUI  OFF CACHE INTERNAL "" )
 set( WITH_CYCLES_OSL             ON CACHE INTERNAL "" )
 #set( WITH_CYCLES_LOGGING         ON CACHE INTERNAL "" )
-set( WITH_CYCLES_OPENSUBDIV      ON CACHE INTERNAL "" )
-set( WITH_CYCLES_EMBREE          ON CACHE INTERNAL "" )
+#set( WITH_CYCLES_OPENSUBDIV      ON CACHE INTERNAL "" )
+#set( WITH_CYCLES_EMBREE          ON CACHE INTERNAL "" )
 set( OPENSUBDIV_ROOT_DIR         ${CMAKE_INSTALL_PREFIX} CACHE INTERNAL "" )
 #set( embree_DIR                  ${CMAKE_INSTALL_PREFIX} CACHE INTERNAL "" )
 set( BOOST_ROOT                  ${GAFFER_ROOT} CACHE INTERNAL "" )
@@ -27,7 +27,6 @@ set( OSL_ROOT_DIR                ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( OPENEXR_ROOT_DIR            ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( WITH_CYCLES_CUDA_BINARIES   ON CACHE INTERNAL "" )
 set( WITH_OPENCOLORIO            OFF CACHE INTERNAL "" )
-set( WITH_CYCLES_LOGGING         OFF CACHE INTERNAL "" )
 set( GLEW_ROOT_DIR               ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( WITH_CYCLES_OPENVDB         ON CACHE INTERNAL "" )
 set( WITH_OPENVDB_BLOSC          ON CACHE INTERNAL "" )
@@ -73,6 +72,8 @@ find_package(Cortex REQUIRED)
 find_package(OpenEXR REQUIRED Imath)
 find_package(OpenShadingLanguage REQUIRED)
 find_package(Embree "3.5.0" REQUIRED)
+find_package(Gflags "2.2.2" REQUIRED)
+find_package(Glog "0.4.0" REQUIRED)
 
 # Cycles defines
 add_definitions(
@@ -81,14 +82,24 @@ add_definitions(
 #	-DCCL_NAMESPACE_BEGIN=namespace\ IECoreCycles\ {\ namespace\ ccl\ {
 #	-DCCL_NAMESPACE_END=}\}
     -DWITH_OSL=1
-    -DWITH_EMBREE=1
-    -DWITH_OPENSUBDIV=1
     -DWITH_OPENCL=1
     -DWITH_CUDA=1
     -DWITH_MULTI=1
     -DWITH_OPENVDB=1
     -DWITH_OPENVDB_BLOSC=1
 )
+
+if( WITH_CYCLES_LOGGING )
+    add_definitions( -DWITH_CYCLES_LOGGING=1 )
+endif()
+
+if( WITH_CYCLES_OPENSUBDIV )
+    add_definitions( -DWITH_OPENSUBDIV=1 )
+endif()
+
+if( WITH_CYCLES_EMBREE )
+    add_definitions( -DWITH_EMBREE=1 )
+endif()
 
 if( WITH_CYCLES_DEVICE_OPTIX )
     add_definitions( -DWITH_OPTIX=1 )
@@ -112,6 +123,7 @@ set(IECORECYCLES_CXX_FILES
     ${IECORECYCLES_SRC_DIR}/CurvesAlgo.cpp
     ${IECORECYCLES_SRC_DIR}/MeshAlgo.cpp
     ${IECORECYCLES_SRC_DIR}/ObjectAlgo.cpp
+    ${IECORECYCLES_SRC_DIR}/ParticleAlgo.cpp
     ${IECORECYCLES_SRC_DIR}/ShaderNetworkAlgo.cpp
     ${IECORECYCLES_SRC_DIR}/SocketAlgo.cpp
     ${IECORECYCLES_SRC_DIR}/Renderer.cpp
@@ -123,6 +135,7 @@ set(IECORECYCLES_H_FILES
     ${IECORECYCLES_INCLUDE_DIR}/Export.h
     ${IECORECYCLES_INCLUDE_DIR}/MeshAlgo.h
     ${IECORECYCLES_INCLUDE_DIR}/ObjectAlgo.h
+    ${IECORECYCLES_INCLUDE_DIR}/ParticleAlgo.h
     ${IECORECYCLES_INCLUDE_DIR}/ShaderNetworkAlgo.h
     ${IECORECYCLES_INCLUDE_DIR}/SocketAlgo.h
     )
@@ -131,6 +144,7 @@ set(GAFFERCYCLES_CXX_FILES
     src/GafferCycles/CyclesAttributes.cpp
     src/GafferCycles/CyclesBackground.cpp
     src/GafferCycles/CyclesLight.cpp
+    src/GafferCycles/CyclesMeshLight.cpp
     src/GafferCycles/CyclesOptions.cpp
     src/GafferCycles/CyclesRender.cpp
     src/GafferCycles/CyclesShader.cpp
@@ -141,6 +155,7 @@ set(GAFFERCYCLES_H_FILES
     include/GafferCycles/CyclesAttributes.h
     include/GafferCycles/CyclesBackground.h
     include/GafferCycles/CyclesLight.h
+    include/GafferCycles/CyclesMeshLight.h
     include/GafferCycles/CyclesOptions.h
     include/GafferCycles/CyclesRender.h
     include/GafferCycles/CyclesShader.h
@@ -174,6 +189,8 @@ target_link_libraries(GafferCycles
     ${CYCLES_LIBRARIES} 
     ${OPENSUBDIV_LIBRARIES}
     ${EMBREE_LIBRARIES}
+    ${GLOG_LIBRARIES}
+    ${GFLAGS_LIBRARIES}
     )
 add_dependencies( GafferCycles cycles )
 
@@ -191,6 +208,8 @@ set_target_properties(GafferCyclesModule PROPERTIES PREFIX "" OUTPUT_NAME "_Gaff
 target_link_libraries(GafferCyclesModule 
     GafferCycles 
     ${CYCLES_LIBRARIES}
+    ${GLOG_LIBRARIES}
+    ${GFLAGS_LIBRARIES}
     )
 target_include_directories(GafferCyclesModule PRIVATE 
     include ${GAFFER_ROOT}/include 

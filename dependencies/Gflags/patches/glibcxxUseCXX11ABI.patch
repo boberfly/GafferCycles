@@ -1,0 +1,12 @@
+--- a/CMakeLists.txt	2018-11-11 13:21:00.000000000 -0800
++++ b/CMakeLists.txt	2019-09-30 03:38:46.652528082 -0700
+@@ -72,6 +72,9 @@
+ 
+ cmake_minimum_required (VERSION 3.0.2 FATAL_ERROR)
+ 
++# VFX Plarform requirement when using GCC 6.3.x
++add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
++
+ if (POLICY CMP0042)
+   cmake_policy (SET CMP0042 NEW)
+ endif ()

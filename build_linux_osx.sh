@@ -8,8 +8,8 @@ if [[ -z "${GAFFER_ROOT}" ]]; then
 fi
 
 # Packaging variables
-VERSION=0.7.0
-GAFFERVERSION=0.54.1.0
+VERSION=0.10.2
+GAFFERVERSION=0.54.2.0
 
 if [[ -z "${GAFFER_BUILD_TYPE}" ]]; then
     echo "WARNING : GAFFER_BUILD_TYPE environment variable not set, defaulting to release"
@@ -43,6 +43,8 @@ export LD_LIBRARY_PATH=$GAFFER_ROOT/lib${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH:-}
 # Dependencies
 cmake -E make_directory install/$GAFFERCYCLES
 cd dependencies
+$GAFFER_ROOT/bin/python ./build/build.py --project Gflags --buildDir $GAFFERCYCLES_INSTALL --forceCCompiler $CC --forceCxxCompiler $CXX
+$GAFFER_ROOT/bin/python ./build/build.py --project Glog --buildDir $GAFFERCYCLES_INSTALL --forceCCompiler $CC --forceCxxCompiler $CXX
 $GAFFER_ROOT/bin/python ./build/build.py --project Embree --buildDir $GAFFERCYCLES_INSTALL --forceCCompiler $CC --forceCxxCompiler $CXX
 $GAFFER_ROOT/bin/python ./build/build.py --project OpenSubdiv --buildDir $GAFFERCYCLES_INSTALL --forceCCompiler $CC --forceCxxCompiler $CXX
 cd ..
@@ -50,7 +52,7 @@ cd ..
 # CMake build
 cmake -E make_directory build/$GAFFERCYCLES
 cd build/$GAFFERCYCLES
-cmake -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE -DGAFFER_ROOT=$GAFFER_ROOT -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_INSTALL_PREFIX=$GAFFERCYCLES_INSTALL $@ ../..
+cmake -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE -DGAFFER_ROOT=$GAFFER_ROOT -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_INSTALL_PREFIX=$GAFFERCYCLES_INSTALL -DWITH_CYCLES_EMBREE=ON -DWITH_CYCLES_OPENSUBDIV=ON -DWITH_CYCLES_LOGGING=ON $@ ../..
 make -j `getconf _NPROCESSORS_ONLN`
 make install
 

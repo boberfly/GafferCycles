@@ -1,4 +1,4 @@
 [submodule "cycles"]
 	path = cycles
-	url = https://github.com/boberfly/cycles
+	url = https://github.com/boberfly/cycles/tree/gaffer-adaptive
 	branch = gaffer

@@ -60,7 +60,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument(
 	"--gafferVersion",
-	default = "0.54.1.0",
+	default = "0.54.2.1",
 	help = "The version of Gaffer to build against. "
 )
 
@@ -321,6 +321,7 @@ manifest = " ".join( [
 	"doc/*",
 	"include/*",
 	"lib/*.cubin",
+	"lib/*.ptx",
 	"lib/libembree3*",
 	"lib/libosdCPU*",
 	"lib/libGafferCycles*",
@@ -335,6 +336,8 @@ depCommands = [
 	"cmake -E make_directory install/{platform}_{buildType}".format( **formatVariables ),
 
 	"cd dependencies && "
+	"./build/build.py --project Gflags --gafferRoot {gafferRoot} --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx} && "
+	"./build/build.py --project Glog --gafferRoot {gafferRoot} --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx} && "
 	"./build/build.py --project Embree --gafferRoot {gafferRoot} --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx} && "
 	"./build/build.py --project OpenSubdiv --gafferRoot {gafferRoot} --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx}".format( 
 		gafferCyclesRoot=gafferCyclesDirName, gafferRoot=gafferDirName, **formatVariables ),
@@ -352,10 +355,15 @@ commands = [
 		" -D CMAKE_CXX_COMPILER={cxx}"
 		" -D OPTIX_ROOT_DIR={optixPath}"
 		" -D WITH_CYCLES_DEVICE_OPTIX={withOptix}"
+		" -D WITH_CYCLES_EMBREE=ON"
+		" -D WITH_CYCLES_OPENSUBDIV=ON"
+		" -D WITH_CYCLES_LOGGING=ON"
 		" ../..".format( gafferCyclesRoot=gafferCyclesDirName, gafferRoot=gafferDirName, withOptix=withOptix, **formatVariables ),
 
 	"cd build/{platform}_{buildType} && cmake --build . --config {buildType} --target install -- -j {jobs}".format( jobs=multiprocessing.cpu_count(), **formatVariables ),
-	"if [ -d \"install/{platform}_{buildType}/lib64\" ]; then mv install/{platform}_{buildType}/lib64/* install/{platform}_{buildType}/lib; fi".format( **formatVariables ),
+	"mv install/{platform}_{buildType}/lib/cmake /tmp/cmake && "
+	"if [ -d \"install/{platform}_{buildType}/lib64\" ]; then mv install/{platform}_{buildType}/lib64/* install/{platform}_{buildType}/lib; fi && "
+	"mv /tmp/cmake/* install/{platform}_{buildType}/lib/cmake".format( **formatVariables ),
 
 	"cd install/{platform}_{buildType} && "
 	"tar -c -z -f /tmp/intermediate.tar {manifest} && "
