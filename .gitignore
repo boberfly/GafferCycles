@@ -8,3 +8,4 @@ dependencies/*/archives
 dependencies/*/working
 .directory
 .vscode
+NVIDIA-OptiX-SDK*
