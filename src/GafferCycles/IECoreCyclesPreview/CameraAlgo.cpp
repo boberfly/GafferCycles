@@ -52,7 +52,7 @@ using namespace IECoreCycles;
 namespace
 {
 
-ccl::Camera *convertCommon( const IECoreScene::Camera *camera, const std::string &nodeName )
+ccl::Camera *convertCommon( const IECoreScene::Camera *camera, const std::string &nodeName, int frame )
 {
 	assert( camera->typeId() == IECoreScene::Camera::staticTypeId() );
 	ccl::Camera *ccam = new ccl::Camera();
@@ -66,7 +66,7 @@ ccl::Camera *convertCommon( const IECoreScene::Camera *camera, const std::string
 		ccam->fov = M_PI_2;
 		if( camera->getFStop() > 0.0f )
 		{
-			ccam->aperturesize = camera->getFocalLength() * camera->getFocalLengthWorldScale() / camera->getFStop();
+			ccam->aperturesize = 0.5f * camera->getFocalLength() * camera->getFocalLengthWorldScale() / camera->getFStop();
 			ccam->focaldistance = camera->getFocusDistance();
 		}
 	}
@@ -87,7 +87,7 @@ ccl::Camera *convertCommon( const IECoreScene::Camera *camera, const std::string
 
 	// Screen window/resolution TODO: full_ might be something to do with cropping?
 	const Imath::Box2f &frustum = camera->frustum();
-	const Imath::V2i &resolution = camera->getResolution();
+	const Imath::V2i &resolution = camera->renderResolution();
 	const float pixelAspectRatio = camera->getPixelAspectRatio();
 	ccam->width = resolution[0];
 	ccam->height = resolution[1];
@@ -95,15 +95,16 @@ ccl::Camera *convertCommon( const IECoreScene::Camera *camera, const std::string
 	ccam->full_height = resolution[1];
 	ccam->viewplane.left = frustum.min.x;
 	ccam->viewplane.right = frustum.max.x;
-	ccam->viewplane.bottom = frustum.min.y;
-	ccam->viewplane.top = frustum.max.y;
+	// Invert the viewplane in Y so Gaffer's aperture offsets and overscan are applied in the correct direction
+	ccam->viewplane.bottom = -frustum.max.y;
+	ccam->viewplane.top = -frustum.min.y;
 	ccam->aperture_ratio = pixelAspectRatio; // This is more for the bokeh, maybe it should be a separate parameter?
 
 	// Clipping planes
 	const Imath::V2f &clippingPlanes = camera->getClippingPlanes();
 	ccam->nearclip = clippingPlanes.x;
 	ccam->farclip = clippingPlanes.y;
-	
+
 	// Crop window
 	if ( camera->hasCropWindow() )
 	{
@@ -115,27 +116,23 @@ ccl::Camera *convertCommon( const IECoreScene::Camera *camera, const std::string
 		ccam->border.clamp();
 	}
 	
-	// Shutter TODO: Need to see if this is correct or not, cycles also has a shutter curve...
+	// Shutter TODO: Cycles also has a shutter curve...
 	const Imath::V2f &shutter = camera->getShutter();
-	if ((shutter.x > 0.0) && (shutter.y > 0.0))
+	ccam->shuttertime = abs( shutter.y - shutter.x );
+
+	// Set the correct motion position.
+	const Imath::V2f relativeShutter = shutter - Imath::V2f( frame );
+	if ( ( relativeShutter.x >= 0.0f ) && ( relativeShutter.y > 0.0f ) )
 	{
 		ccam->motion_position = ccl::Camera::MOTION_POSITION_START;
-		ccam->shuttertime = shutter.x + shutter.y;
 	}
-	else if ((shutter.x < 0.0) && (shutter.y > 0.0))
-	{
-		ccam->motion_position = ccl::Camera::MOTION_POSITION_CENTER;
-		ccam->shuttertime = abs(shutter.x) + shutter.y;
-	}
-	else if ((shutter.x < 0.0) && (shutter.y <= 0.0))
+	else if ( ( relativeShutter.x < 0.0f ) && ( relativeShutter.y <= 0.0f ) )
 	{
 		ccam->motion_position = ccl::Camera::MOTION_POSITION_END;
-		ccam->shuttertime = abs(shutter.x) + abs(shutter.y);
 	}
 	else
 	{
 		ccam->motion_position = ccl::Camera::MOTION_POSITION_CENTER;
-		ccam->shuttertime = 1.0;
 	}
 
 	return ccam;
@@ -155,9 +152,9 @@ namespace CameraAlgo
 
 {
 
-ccl::Camera *convert( const IECoreScene::Camera *camera, const std::string &nodeName )
+ccl::Camera *convert( const IECoreScene::Camera *camera, const std::string &nodeName, int frame )
 {
-	return convertCommon( camera, nodeName );
+	return convertCommon( camera, nodeName, frame );
 }
 
 } // namespace CameraAlgo

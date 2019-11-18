@@ -1909,16 +1909,18 @@ class CameraCache : public IECore::RefCounted
 		}
 
 		// Can be called concurrently with other get() calls.
-		SharedCCameraPtr get( const IECoreScene::Camera *camera, const std::string &name )
+		SharedCCameraPtr get( const IECoreScene::Camera *camera, const std::string &name, int frame )
 		{
-			const IECore::MurmurHash hash = camera->Object::hash();
+			IECore::MurmurHash hash = camera->Object::hash();
+
+			hash.append( frame );
 
 			Cache::accessor a;
 			m_cache.insert( a, hash );
 
 			if( !a->second )
 			{
-				a->second = SharedCCameraPtr( CameraAlgo::convert( camera, name ) );
+				a->second = SharedCCameraPtr( CameraAlgo::convert( camera, name, frame ) );
 			}
 
 			return a->second;
@@ -2961,7 +2963,7 @@ class CyclesRenderer final : public IECoreScenePreview::Renderer
 
 		ObjectInterfacePtr camera( const std::string &name, const IECoreScene::Camera *camera, const AttributesInterface *attributes ) override
 		{
-			SharedCCameraPtr ccamera = m_cameraCache->get( camera, name );
+			SharedCCameraPtr ccamera = m_cameraCache->get( camera, name, m_frame );
 			if( !ccamera )
 			{
 				return nullptr;
@@ -3347,7 +3349,7 @@ class CyclesRenderer final : public IECoreScenePreview::Renderer
 				}
 				else
 				{
-					auto ccamera = m_cameraCache->get( cameraIt->second.get(), cameraIt->first );
+					auto ccamera = m_cameraCache->get( cameraIt->second.get(), cameraIt->first, m_frame );
 					if( m_scene->camera != ccamera.get() )
 					{
 						m_scene->camera = ccamera.get();
@@ -3373,7 +3375,7 @@ class CyclesRenderer final : public IECoreScenePreview::Renderer
 				}
 				else
 				{
-					auto ccamera = m_cameraCache->get( cameraIt->second.get(), cameraIt->first );
+					auto ccamera = m_cameraCache->get( cameraIt->second.get(), cameraIt->first, m_frame );
 					m_instanceCache->updateDicingCamera( ccamera.get() );
 				}
 			}
