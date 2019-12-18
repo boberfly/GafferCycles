@@ -60,7 +60,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument(
 	"--gafferVersion",
-	default = "0.54.2.1",
+	default = "0.55.1.0",
 	help = "The version of Gaffer to build against. "
 )
 
@@ -137,6 +137,13 @@ parser.add_argument(
 	help = "OptiX path."
 )
 
+parser.add_argument(
+	"--experimental",
+	type = distutils.util.strtobool,
+	default = False,
+	help = "Enable experimental build. Currently compiles in adaptive sampling, OpenVDB, light groups and texture cache modes."
+)
+
 args = parser.parse_args()
 
 buildType = ""
@@ -190,6 +197,7 @@ formatVariables = {
 	"output" : os.path.abspath( args.output ),
 	"optix" : args.optix,
 	"optixPath" : args.optixPath,
+	"experimental" : args.experimental,
 }
 
 packageName = "gafferCycles-{version}-gaffer-{gafferVersion}-{platform}".format( **formatVariables )
@@ -228,7 +236,7 @@ if args.docker and not os.path.exists( "/.dockerenv" ) :
 	if args.interactive :
 		containerBashCommand = "{env} {termCmd}".format( env = containerEnv, termCmd = termCmd )
 	else :
-		containerBashCommand = "{env} {pyCmd} --gafferVersion {gafferVersion} --cyclesVersion {cyclesVersion} --version {version} --upload {upload} --platform {platform} --optix {optix} --output=./out".format( pyCmd = pyCmd, env = containerEnv, **formatVariables )
+		containerBashCommand = "{env} {pyCmd} --gafferVersion {gafferVersion} --cyclesVersion {cyclesVersion} --version {version} --upload {upload} --platform {platform} --optix {optix} --experimental {experimental} --output=./out".format( pyCmd = pyCmd, env = containerEnv, **formatVariables )
 
 	containerCommand = "docker run --name {name} -i -t gaffercycles-build -c '{command}'".format(
 		name = containerName,
@@ -354,11 +362,16 @@ commands = [
 		" -D GAFFER_ROOT={gafferRoot}"
 		" -D CMAKE_CXX_COMPILER={cxx}"
 		" -D OPTIX_ROOT_DIR={optixPath}"
+		" -D WITH_CUDA=ON"
 		" -D WITH_CYCLES_DEVICE_OPTIX={withOptix}"
 		" -D WITH_CYCLES_EMBREE=ON"
 		" -D WITH_CYCLES_OPENSUBDIV=ON"
 		" -D WITH_CYCLES_LOGGING=ON"
-		" ../..".format( gafferCyclesRoot=gafferCyclesDirName, gafferRoot=gafferDirName, withOptix=withOptix, **formatVariables ),
+		" -D WITH_CYCLES_ADAPTIVE_SAMPLING={withExperimental}"
+		" -D WITH_CYCLES_TEXTURE_CACHE={withExperimental}"
+		" -D WITH_CYCLES_OPENVDB={withExperimental}"
+		" -D WITH_CYCLES_LIGHTGROUPS={withExperimental}"
+		" ../..".format( gafferCyclesRoot=gafferCyclesDirName, gafferRoot=gafferDirName, withOptix=withOptix, withExperimental=str( int( formatVariables["experimental"] ) ), **formatVariables ),
 
 	"cd build/{platform}_{buildType} && cmake --build . --config {buildType} --target install -- -j {jobs}".format( jobs=multiprocessing.cpu_count(), **formatVariables ),
 	"mv install/{platform}_{buildType}/lib/cmake /tmp/cmake && "

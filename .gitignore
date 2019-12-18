@@ -9,3 +9,4 @@ dependencies/*/working
 .directory
 .vscode
 NVIDIA-OptiX-SDK*
+/out

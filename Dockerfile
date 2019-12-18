@@ -76,9 +76,9 @@ RUN yum install -y inkscape
 
 RUN yum install -y wget
 
-# CUDA 10.1
+# CUDA 10.2
 
-RUN wget -O cuda.rpm https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda-repo-rhel7-10-1-local-10.1.105-418.39-1.0-1.x86_64.rpm --progress=dot:mega \
+RUN wget -O cuda.rpm http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda-repo-rhel7-10-2-local-10.2.89-440.33.01-1.0-1.x86_64.rpm --progress=dot:mega \
     && rpm -i cuda.rpm && yum install -y cuda && rm cuda.rpm
 
 # OptiX 7.0.0

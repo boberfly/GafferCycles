@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-python build.py --version 0.11.0 --cyclesVersion 0.11.0 --optix 1 --docker 1 --upload 0 $@
+python build.py --version 0.12.1 --cyclesVersion 0.12.1 --optix 1 --docker 1 --upload 0 $@

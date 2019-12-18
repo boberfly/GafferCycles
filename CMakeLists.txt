@@ -14,11 +14,7 @@ add_compile_options("$<$<CONFIG:DEBUG>:-DWITH_CYCLES_DEBUG=1>")
 # Cycles Standalone
 set( WITH_CYCLES_STANDALONE_GUI  OFF CACHE INTERNAL "" )
 set( WITH_CYCLES_OSL             ON CACHE INTERNAL "" )
-#set( WITH_CYCLES_LOGGING         ON CACHE INTERNAL "" )
-#set( WITH_CYCLES_OPENSUBDIV      ON CACHE INTERNAL "" )
-#set( WITH_CYCLES_EMBREE          ON CACHE INTERNAL "" )
 set( OPENSUBDIV_ROOT_DIR         ${CMAKE_INSTALL_PREFIX} CACHE INTERNAL "" )
-#set( embree_DIR                  ${CMAKE_INSTALL_PREFIX} CACHE INTERNAL "" )
 set( BOOST_ROOT                  ${GAFFER_ROOT} CACHE INTERNAL "" )
 #set( LLVM_STATIC                 ON CACHE INTERNAL "" )
 #set( LLVM_ROOT_DIR               ${GAFFER_DEPENDENCIES_ROOT} CACHE INTERNAL "" )
@@ -60,54 +56,67 @@ set( CORTEX_LOCATION ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( OCIO_PATH ${GAFFER_ROOT} CACHE INTERNAL "" )
 
 list(APPEND CMAKE_MODULE_PATH
-	"${PROJECT_SOURCE_DIR}/cycles/src/cmake/Modules"
+    "${PROJECT_SOURCE_DIR}/cycles/src/cmake/Modules"
     "${PROJECT_SOURCE_DIR}/cmake/Modules"
 )
 list(APPEND CMAKE_PREFIX_PATH
     "${CMAKE_INSTALL_PREFIX}/lib/cmake/embree-3.5.0"
     "${GAFFER_ROOT}/lib/cmake/embree-3.5.0"
 )
-find_package(OpenSubdiv REQUIRED)
 find_package(Cortex REQUIRED)
 find_package(OpenEXR REQUIRED Imath)
 find_package(OpenShadingLanguage REQUIRED)
-find_package(Embree "3.5.0" REQUIRED)
-find_package(OpenVDB REQUIRED)
-find_package(Gflags "2.2.2" REQUIRED)
-find_package(Glog "0.4.0" REQUIRED)
 
 # Cycles defines
 add_definitions(
-	-DCCL_NAMESPACE_BEGIN=namespace\ ccl\ {
-	-DCCL_NAMESPACE_END=}
+    -DCCL_NAMESPACE_BEGIN=namespace\ ccl\ {
+    -DCCL_NAMESPACE_END=}
 #	-DCCL_NAMESPACE_BEGIN=namespace\ IECoreCycles\ {\ namespace\ ccl\ {
 #	-DCCL_NAMESPACE_END=}\}
     -DWITH_OSL=1
     -DWITH_OPENCL=1
-    -DWITH_CUDA=1
     -DWITH_MULTI=1
-    -DWITH_OPENVDB=1
-    -DWITH_OPENVDB_BLOSC=1
 )
 
+if( WITH_CUDA )
+    add_definitions( -DWITH_CUDA=1 )
+endif()
+
 if( WITH_CYCLES_LOGGING )
+    find_package(Gflags "2.2.2" REQUIRED)
+    find_package(Glog "0.4.0" REQUIRED)
     add_definitions( -DWITH_CYCLES_LOGGING=1 )
 endif()
 
 if( WITH_CYCLES_OPENSUBDIV )
+    find_package(OpenSubdiv REQUIRED)
     add_definitions( -DWITH_OPENSUBDIV=1 )
 endif()
 
 if( WITH_CYCLES_EMBREE )
+    find_package(Embree "3.5.0" REQUIRED)
     add_definitions( -DWITH_EMBREE=1 )
 endif()
 
 if( WITH_CYCLES_DEVICE_OPTIX )
-    add_definitions( -DWITH_OPTIX=1 )
+    add_definitions( -DWITH_OPTIX=1 -DWITH_CUDA=1 )
 endif()
 
 if( WITH_CYCLES_ADAPTIVE_SAMPLING )
     add_definitions( -DWITH_CYCLES_ADAPTIVE_SAMPLING=1 )
+endif()
+
+if( WITH_CYCLES_TEXTURE_CACHE )
+    add_definitions( -DWITH_CYCLES_TEXTURE_CACHE=1 )
+endif()
+
+if( WITH_CYCLES_OPENVDB )
+    find_package(OpenVDB REQUIRED)
+    add_definitions( -DWITH_OPENVDB=1 -DWITH_OPENVDB_BLOSC=1 )
+endif()
+
+if( WITH_CYCLES_LIGHTGROUPS )
+    add_definitions( -DWITH_CYCLES_LIGHTGROUPS=1 )
 endif()
 
 set(CMAKE_CXX_STANDARD 11)
