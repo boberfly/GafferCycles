@@ -200,7 +200,11 @@ formatVariables = {
 	"experimental" : args.experimental,
 }
 
-packageName = "gafferCycles-{version}-gaffer-{gafferVersion}-{platform}".format( **formatVariables )
+exp = ""
+if formatVariables["experimental"] :
+	exp = "-experimental"
+
+packageName = "gafferCycles-{version}{exp}-gaffer-{gafferVersion}-{platform}".format( exp=exp, **formatVariables )
 formatVariables["uploadFile"] = "%s.tar.gz" % packageName
 
 # If we're going to be doing an upload, then check that the release exists. Better
@@ -361,8 +365,9 @@ commands = [
 		" -D CMAKE_BUILD_TYPE={buildType}"
 		" -D GAFFER_ROOT={gafferRoot}"
 		" -D CMAKE_CXX_COMPILER={cxx}"
+		" -D WITH_CYCLES_DEVICE_CUDA=ON"
+		" -D WITH_CYCLES_CUDA_BINARIES=ON"
 		" -D OPTIX_ROOT_DIR={optixPath}"
-		" -D WITH_CUDA=ON"
 		" -D WITH_CYCLES_DEVICE_OPTIX={withOptix}"
 		" -D WITH_CYCLES_EMBREE=ON"
 		" -D WITH_CYCLES_OPENSUBDIV=ON"
