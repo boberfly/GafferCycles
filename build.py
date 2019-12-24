@@ -370,6 +370,7 @@ commands = [
 		" -D WITH_CYCLES_ADAPTIVE_SAMPLING={withExperimental}"
 		" -D WITH_CYCLES_TEXTURE_CACHE={withExperimental}"
 		" -D WITH_CYCLES_OPENVDB={withExperimental}"
+		" -D WITH_OPENVDB_BLOSC={withExperimental}"
 		" -D WITH_CYCLES_LIGHTGROUPS={withExperimental}"
 		" ../..".format( gafferCyclesRoot=gafferCyclesDirName, gafferRoot=gafferDirName, withOptix=withOptix, withExperimental=str( int( formatVariables["experimental"] ) ), **formatVariables ),
 
