@@ -79,7 +79,7 @@ add_definitions(
 )
 
 if( WITH_CYCLES_DEVICE_CUDA )
-    add_definitions( -DWITH_CUDA=1 -DWITH_CYCLES_CUDA_BINARIES=1)
+    add_definitions( -DWITH_CYCLES_CUDA_BINARIES=1 )
 endif()
 
 if( WITH_CYCLES_LOGGING )
@@ -99,7 +99,7 @@ if( WITH_CYCLES_EMBREE )
 endif()
 
 if( WITH_CYCLES_DEVICE_OPTIX )
-    add_definitions( -DWITH_OPTIX=1 -DWITH_CUDA=1 -DWITH_CYCLES_CUDA_BINARIES=1 )
+    add_definitions( -DWITH_OPTIX=1 -DWITH_CYCLES_CUDA_BINARIES=1 )
 endif()
 
 if( WITH_CYCLES_ADAPTIVE_SAMPLING )
@@ -112,7 +112,7 @@ endif()
 
 if( WITH_CYCLES_OPENVDB )
     find_package(OpenVDB REQUIRED)
-    add_definitions( -DWITH_OPENVDB=1 -DWITH_OPENVDB_BLOSC=1 )
+    add_definitions( -DWITH_CYCLES_OPENVDB=1 -DWITH_OPENVDB=1 -DWITH_OPENVDB_BLOSC=1 )
 endif()
 
 if( WITH_CYCLES_LIGHTGROUPS )
