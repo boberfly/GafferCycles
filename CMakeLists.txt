@@ -28,6 +28,17 @@ set( GLEW_ROOT_DIR               ${GAFFER_ROOT} CACHE INTERNAL "" )
 #set( WITH_OPENVDB_BLOSC          ON CACHE INTERNAL "" )
 set( OPENVDB_ROOT_DIR            ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( TBB_INSTALL_DIR             ${GAFFER_ROOT} CACHE INTERNAL "" )
+if (MSVC)
+    set( ZLIB_ROOT ${GAFFER_ROOT} CACHE INTERNAL "" )
+    set( ZLIB_INCLUDE_DIRS ${GAFFER_ROOT}/include CACHE INTERNAL "" )
+    set( ZLIB_LIBRARIES ${GAFFER_ROOT}/lib/zlib.lib CACHE INTERNAL "" )
+    set( ZLIB_INCLUDE_DIR ${GAFFER_ROOT}/include CACHE INTERNAL "" )
+    set( ZLIB_LIBRARY ${GAFFER_ROOT}/lib/zlib.lib CACHE INTERNAL "" )
+    set( ZLIB_DIR ${GAFFER_ROOT} CACHE INTERNAL "" )
+    set( PNG_LIBRARIES ${GAFFER_ROOT}/lib/libpng.lib CACHE INTERNAL "" )
+    set( JPEG_LIBRARIES ${GAFFER_ROOT}/lib/libjpeg.lib CACHE INTERNAL "" )
+    set( TIFF_LIBRARY ${GAFFER_ROOT}/lib/libtiff.lib CACHE INTERNAL "" )
+endif()
 add_subdirectory( cycles )
 
 # Cycles Standalone source/headers
@@ -66,6 +77,10 @@ list(APPEND CMAKE_PREFIX_PATH
 find_package(Cortex REQUIRED)
 find_package(OpenEXR REQUIRED Imath)
 find_package(OpenShadingLanguage REQUIRED)
+find_package(OpenImageIO REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(Boost REQUIRED)
+include_directories( ${Boost_INCLUDE_DIRS} )
 
 # Cycles defines
 add_definitions(
@@ -77,6 +92,13 @@ add_definitions(
     -DWITH_OPENCL=1
     -DWITH_MULTI=1
 )
+
+if( MSVC )
+    set(CMAKE_CXX_FLAGS "/nologo /J /Gd /EHsc /MP" CACHE STRING "MSVC MD C++ flags " FORCE)
+    set(CMAKE_C_FLAGS   "/nologo /J /Gd /MP"       CACHE STRING "MSVC MD C++ flags " FORCE)
+    set(CMAKE_CXX_FLAGS_DEBUG "/Od /RTC1 /MDd /Zi /MP" CACHE STRING "MSVC MD flags " FORCE)
+    add_definitions( -DOPENEXR_DLL -DNOMINMAX -D__PRETTY_FUNCTION__=__FUNCSIG__ -DBOOST_ALL_DYN_LINK )
+endif()
 
 if( WITH_CYCLES_DEVICE_CUDA )
     add_definitions( -DWITH_CYCLES_CUDA_BINARIES=1 )
@@ -192,12 +214,17 @@ target_include_directories(GafferCycles PRIVATE
     )
 target_link_libraries(GafferCycles 
     ${OPENEXR_IMATH_LIBRARY}
+    ${OPENIMAGEIO_LIBRARIES}
     ${OSL_LIBRARIES}
     ${Cortex_IECORE_LIBRARY} 
     ${Cortex_IECORESCENE_LIBRARY} 
+    ${Cortex_IECOREIMAGE_LIBRARY}
     Gaffer
     GafferOSL
     GafferScene
+    GafferDispatch
+    ${OPENGL_LIBRARIES}
+    ${GLEW_LIBRARY}
     ${CYCLES_LIBRARIES} 
     ${OPENSUBDIV_LIBRARIES}
     ${EMBREE_LIBRARIES}
@@ -218,8 +245,14 @@ add_library(GafferCyclesModule MODULE
     src/GafferCyclesModule/GafferCyclesModule.cpp
     )
 set_target_properties(GafferCyclesModule PROPERTIES PREFIX "" OUTPUT_NAME "_GafferCycles" )
+if( "${CMAKE_SYSTEM_NAME}" MATCHES "Darwin" )
+    set_target_properties( GafferCyclesModule PROPERTIES SUFFIX ".so" )
+elseif( "${CMAKE_SYSTEM_NAME}" MATCHES "Windows" )
+    set_target_properties( GafferCyclesModule PROPERTIES SUFFIX ".pyd" )
+endif()
 target_link_libraries(GafferCyclesModule 
     GafferCycles 
+    ${Cortex_IECOREPYTHON_LIBRARY}
     ${CYCLES_LIBRARIES}
     ${GLOG_LIBRARIES}
     ${GFLAGS_LIBRARIES}

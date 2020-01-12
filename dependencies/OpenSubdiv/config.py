@@ -13,7 +13,7 @@
 		"mkdir gafferBuild",
 		"cd gafferBuild &&"
 			" cmake"
-			" -G {cmakeGenerator}"
+			" -G {generator}"
 			" -D CMAKE_CXX_COMPILER={cxxCompiler}"
 			" -D CMAKE_INSTALL_PREFIX={buildDir}"
 			" -D CMAKE_PREFIX_PATH={gafferRoot}"
@@ -35,8 +35,38 @@
 			" -D NO_GLFW_X11=1"
 			" -D GLEW_LOCATION={gafferRoot}"
 			" ..",
-		"cd gafferBuild && cmake --build . --config {cmakeBuildType} --target install -- -j {jobs}",
+		"cd gafferBuild && cmake --build . --config {cmakeBuildType} --target install",
 
 	],
+
+	"platform:linux" : {
+
+		"variables" : {
+
+			"generator" : "\"Unix Makefiles\""
+
+		},
+
+	},
+
+	"platform:osx" : {
+
+		"variables" : {
+
+			"generator" : "\"Unix Makefiles\""
+
+		},
+
+	},
+
+	"platform:windows" : {
+
+		"variables" : {
+
+			"generator" : "\"Visual Studio 15 2017 Win64\""
+
+		},
+
+	},
 
 }

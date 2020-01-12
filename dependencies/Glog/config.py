@@ -14,6 +14,7 @@
 		"cd gafferBuild &&"
 			" cmake"
 			" -G {cmakeGenerator}"
+			" -D CMAKE_BUILD_TYPE={cmakeBuildType}"
 			" -D CMAKE_C_COMPILER={cCompiler}"
 			" -D CMAKE_CXX_COMPILER={cxxCompiler}"
 			" -D CMAKE_INSTALL_PREFIX={buildDir}"
