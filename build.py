@@ -334,7 +334,6 @@ manifest = " ".join( [
 	"include/*",
 	"lib/*.cubin",
 	"lib/*.ptx",
-	"lib/libembree3*",
 	"lib/libosdCPU*",
 	"lib/libGafferCycles*",
 	"license/*",

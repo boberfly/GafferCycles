@@ -72,10 +72,7 @@ list(APPEND CMAKE_MODULE_PATH
     "${PROJECT_SOURCE_DIR}/cycles/src/cmake/Modules"
     "${PROJECT_SOURCE_DIR}/cmake/Modules"
 )
-list(APPEND CMAKE_PREFIX_PATH
-    "${CMAKE_INSTALL_PREFIX}/lib/cmake/embree-3.5.0"
-    "${GAFFER_ROOT}/lib/cmake/embree-3.5.0"
-)
+
 find_package(Cortex REQUIRED)
 find_package(OpenEXR REQUIRED Imath)
 find_package(OpenShadingLanguage REQUIRED)
@@ -119,7 +116,7 @@ if( WITH_CYCLES_OPENSUBDIV )
 endif()
 
 if( WITH_CYCLES_EMBREE )
-    find_package(Embree "3.5.0" REQUIRED)
+    find_package(Embree REQUIRED)
     add_definitions( -DWITH_EMBREE=1 )
 endif()
 

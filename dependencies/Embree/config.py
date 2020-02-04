@@ -2,7 +2,7 @@
 
 	"downloads" : [
 
-		"https://github.com/embree/embree/archive/v3.5.0.tar.gz"
+		"https://github.com/embree/embree/archive/v3.7.0.tar.gz"
 
 	],
 
@@ -19,12 +19,12 @@
 			" -D CMAKE_PREFIX_PATH={gafferRoot}"
 			" -D CMAKE_BUILD_TYPE={cmakeBuildType}"
 			" -D {libLinkType}"
-			" -DEMBREE_ISPC_SUPPORT=OFF"
-			" -DEMBREE_TUTORIALS=OFF"
-			" -DEMBREE_RAY_MASK=ON"
-			" -DEMBREE_FILTER_FUNCTION=ON"
-			" -DEMBREE_BACKFACE_CULLING=OFF"
-			" -DEMBREE_TASKING_SYSTEM=INTERNAL"
+			" -D EMBREE_ISPC_SUPPORT=OFF"
+			" -D EMBREE_TUTORIALS=OFF"
+			" -D EMBREE_RAY_MASK=ON"
+			" -D EMBREE_FILTER_FUNCTION=ON"
+			" -D EMBREE_BACKFACE_CULLING=OFF"
+			" -D EMBREE_TASKING_SYSTEM=INTERNAL"
 			" ..",
 		"cd gafferBuild && cmake --build . --config {cmakeBuildType} --target install -- -j {jobs}",
 
@@ -34,7 +34,7 @@
 
 		"static" : "EMBREE_STATIC_LIB=ON",
 		"shared" : "EMBREE_STATIC_LIB=OFF",
-		"default" : "EMBREE_STATIC_LIB=OFF",
+		"default" : "EMBREE_STATIC_LIB=ON",
 
 	},
 
