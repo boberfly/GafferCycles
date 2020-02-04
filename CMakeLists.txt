@@ -78,6 +78,7 @@ list(APPEND CMAKE_PREFIX_PATH
 find_package(Cortex REQUIRED)
 find_package(OpenEXR REQUIRED Imath)
 find_package(OpenShadingLanguage REQUIRED)
+find_package(OpenColorIO REQUIRED)
 find_package(OpenImageIO REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(Boost REQUIRED)
@@ -215,6 +216,7 @@ target_include_directories(GafferCycles PRIVATE
     )
 target_link_libraries(GafferCycles 
     ${OPENEXR_IMATH_LIBRARY}
+    ${OCIO_LIBRARIES}
     ${OPENIMAGEIO_LIBRARIES}
     ${OSL_LIBRARIES}
     ${Cortex_IECORE_LIBRARY} 
