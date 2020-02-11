@@ -1,5 +1,7 @@
 # GafferCycles
 
+![GafferCycles](gaffercycles.png) 
+
 Cycles for Gaffer. Cycles is a submodule to this project, and will grab the dependencies from
 the Gaffer install directory. Most all of Cycles' dependencies are covered by Gaffer, except
 for the optional dependencies OpenSubdiv and Embree.
