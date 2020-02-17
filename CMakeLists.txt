@@ -161,6 +161,8 @@ set(IECORECYCLES_CXX_FILES
     ${IECORECYCLES_SRC_DIR}/SocketAlgo.cpp
     ${IECORECYCLES_SRC_DIR}/Renderer.cpp
     ${IECORECYCLES_SRC_DIR}/VDBAlgo.cpp
+    ${IECORECYCLES_SRC_DIR}/Mikktspace/mikktspace.c
+    ${IECORECYCLES_SRC_DIR}/Mikktspace/mikktspace.h
     )
 set(IECORECYCLES_H_FILES
     ${IECORECYCLES_INCLUDE_DIR}/AttributeAlgo.h
