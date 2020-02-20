@@ -36,6 +36,8 @@
 #include "GafferCycles/IECoreCyclesPreview/ObjectAlgo.h"
 #include "GafferCycles/IECoreCyclesPreview/SocketAlgo.h"
 
+#include "Gaffer/Context.h"
+
 #include "IECoreScene/Camera.h"
 
 #include "IECore/SimpleTypedData.h"
@@ -100,6 +102,11 @@ ccl::Camera *convertCommon( const IECoreScene::Camera *camera, const std::string
 	ccam->nearclip = clippingPlanes.x;
 	ccam->farclip = clippingPlanes.y;
 	
+	// Invert the viewplane in Y so Gaffer's aperture offsets and overscan are applied in the correct direction
+	swap( ccam->viewplane.bottom, ccam->viewplane.top );
+	ccam->viewplane.bottom *= -1.0f;
+	ccam->viewplane.top *= -1.0f;
+	
 	// Crop window
 	if ( camera->hasCropWindow() )
 	{
@@ -111,27 +118,22 @@ ccl::Camera *convertCommon( const IECoreScene::Camera *camera, const std::string
 		ccam->border.clamp();
 	}
 	
-	// Shutter TODO: Need to see if this is correct or not, cycles also has a shutter curve...
+	// Shutter TODO: Cycles also has a shutter curve...
 	const Imath::V2f &shutter = camera->getShutter();
-	if ((shutter.x > 0.0) && (shutter.y > 0.0))
+	ccam->shuttertime = shutter.y - shutter.x;
+	
+	const Imath::V2f relativeShutter = shutter - Imath::V2f( Gaffer::Context::current()->getFrame() );
+	if ((relativeShutter.x >= 0.0) && (relativeShutter.y > 0.0))
 	{
 		ccam->motion_position = ccl::Camera::MOTION_POSITION_START;
-		ccam->shuttertime = shutter.x + shutter.y;
 	}
-	else if ((shutter.x < 0.0) && (shutter.y > 0.0))
-	{
-		ccam->motion_position = ccl::Camera::MOTION_POSITION_CENTER;
-		ccam->shuttertime = abs(shutter.x) + shutter.y;
-	}
-	else if ((shutter.x < 0.0) && (shutter.y <= 0.0))
+	else if ((relativeShutter.x < 0.0) && (relativeShutter.y <= 0.0))
 	{
 		ccam->motion_position = ccl::Camera::MOTION_POSITION_END;
-		ccam->shuttertime = abs(shutter.x) + abs(shutter.y);
 	}
 	else
 	{
 		ccam->motion_position = ccl::Camera::MOTION_POSITION_CENTER;
-		ccam->shuttertime = 1.0;
 	}
 
 	for( CompoundDataMap::const_iterator it = camera->parameters().begin(), eIt = camera->parameters().end(); it != eIt; ++it )
