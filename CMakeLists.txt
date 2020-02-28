@@ -217,6 +217,7 @@ target_include_directories(GafferCycles PRIVATE
     ${OPENSUBDIV_INCLUDE_DIR}
     )
 target_link_libraries(GafferCycles 
+    ${OPENEXR_IEX_LIBRARY}
     ${OPENEXR_IMATH_LIBRARY}
     ${OCIO_LIBRARIES}
     ${OPENIMAGEIO_LIBRARIES}
