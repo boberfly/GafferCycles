@@ -124,10 +124,6 @@ if( WITH_CYCLES_DEVICE_OPTIX )
     add_definitions( -DWITH_OPTIX=1 -DWITH_CYCLES_CUDA_BINARIES=1 )
 endif()
 
-if( WITH_CYCLES_ADAPTIVE_SAMPLING )
-    add_definitions( -DWITH_CYCLES_ADAPTIVE_SAMPLING=1 )
-endif()
-
 if( WITH_CYCLES_TEXTURE_CACHE )
     add_definitions( -DWITH_CYCLES_TEXTURE_CACHE=1 )
 endif()

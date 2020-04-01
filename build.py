@@ -371,7 +371,6 @@ commands = [
 		" -D WITH_CYCLES_EMBREE=ON"
 		" -D WITH_CYCLES_OPENSUBDIV=ON"
 		" -D WITH_CYCLES_LOGGING=ON"
-		" -D WITH_CYCLES_ADAPTIVE_SAMPLING={withExperimental}"
 		" -D WITH_CYCLES_TEXTURE_CACHE={withExperimental}"
 		" -D WITH_CYCLES_OPENVDB={withExperimental}"
 		" -D WITH_OPENVDB_BLOSC={withExperimental}"
