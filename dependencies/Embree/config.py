@@ -2,7 +2,7 @@
 
 	"downloads" : [
 
-		"https://github.com/embree/embree/archive/v3.7.0.tar.gz"
+		"https://github.com/embree/embree/archive/v3.8.0.tar.gz"
 
 	],
 
@@ -24,7 +24,9 @@
 			" -D EMBREE_RAY_MASK=ON"
 			" -D EMBREE_FILTER_FUNCTION=ON"
 			" -D EMBREE_BACKFACE_CULLING=OFF"
-			" -D EMBREE_TASKING_SYSTEM=INTERNAL"
+			" -D EMBREE_TASKING_SYSTEM=TBB"
+			" -D EMBREE_TBB_ROOT={gafferRoot}"
+			" -D EMBREE_MAX_ISA=AVX2"
 			" ..",
 		"cd gafferBuild && cmake --build . --config {cmakeBuildType} --target install -- -j {jobs}",
 
