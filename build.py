@@ -141,7 +141,7 @@ parser.add_argument(
 	"--experimental",
 	type = distutils.util.strtobool,
 	default = False,
-	help = "Enable experimental build. Currently compiles in adaptive sampling, OpenVDB, light groups and texture cache modes."
+	help = "Enable experimental build. Currently compiles light groups and texture cache modes."
 )
 
 args = parser.parse_args()
@@ -372,8 +372,6 @@ commands = [
 		" -D WITH_CYCLES_OPENSUBDIV=ON"
 		" -D WITH_CYCLES_LOGGING=ON"
 		" -D WITH_CYCLES_TEXTURE_CACHE={withExperimental}"
-		" -D WITH_CYCLES_OPENVDB={withExperimental}"
-		" -D WITH_OPENVDB_BLOSC={withExperimental}"
 		" -D WITH_CYCLES_LIGHTGROUPS={withExperimental}"
 		" ../..".format( gafferCyclesRoot=gafferCyclesDirName, gafferRoot=gafferDirName, withOptix=withOptix, withExperimental=str( int( formatVariables["experimental"] ) ), **formatVariables ),
 
