@@ -1,6 +1,9 @@
 # GafferCycles
 
-![GafferCycles](gaffercycles.png) 
+![GafferCycles](gaffercycles.jpg)
+- ["Old Attic Interior Scene" by David Lesperance](https://developer.nvidia.com/usd) (Public Domain)
+- ["GafferBot" from GafferHQ](https://github.com/GafferHQ/resources) (BSD)
+- ["Cloud" from Walt Disney Animation Studios](https://www.technology.disneyanimation.com/clouds) (CC BY-SA 3.0)
 
 Cycles for Gaffer. Cycles is a submodule to this project, and will grab the dependencies from
 the Gaffer install directory. Most all of Cycles' dependencies are covered by Gaffer, except
