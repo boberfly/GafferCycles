@@ -373,6 +373,7 @@ commands = [
 		" -D WITH_CYCLES_LOGGING=ON"
 		" -D WITH_CYCLES_TEXTURE_CACHE={withExperimental}"
 		" -D WITH_CYCLES_LIGHTGROUPS={withExperimental}"
+		" -D WITH_OPENIMAGEDENOISE=ON"
 		" ../..".format( gafferCyclesRoot=gafferCyclesDirName, gafferRoot=gafferDirName, withOptix=withOptix, withExperimental=str( int( formatVariables["experimental"] ) ), **formatVariables ),
 
 	"cd build/{platform}_{buildType} && cmake --build . --config {buildType} --target install -- -j {jobs}".format( jobs=multiprocessing.cpu_count(), **formatVariables ),

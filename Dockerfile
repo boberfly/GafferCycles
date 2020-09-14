@@ -76,15 +76,15 @@ RUN yum install -y inkscape
 
 RUN yum install -y wget
 
-# CUDA 10.2
+# CUDA 11.0
 
-RUN wget -O cuda.rpm http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda-repo-rhel7-10-2-local-10.2.89-440.33.01-1.0-1.x86_64.rpm --progress=dot:mega \
+RUN wget -O cuda.rpm https://developer.download.nvidia.com/compute/cuda/11.0.3/local_installers/cuda-repo-rhel7-11-0-local-11.0.3_450.51.06-1.x86_64.rpm --progress=dot:mega \
     && rpm -i cuda.rpm && yum install -y cuda && rm cuda.rpm
 
-# OptiX 7.0.0
+# OptiX 7.1.0
 
-COPY NVIDIA-OptiX-SDK-7.0.0-linux64.sh /
-RUN mkdir /optix && ./NVIDIA-OptiX-SDK-7.0.0-linux64.sh --skip-license --prefix=/optix --exclude-subdir
+COPY NVIDIA-OptiX-SDK-7.1.0-linux64-x86_64.sh /
+RUN mkdir /optix && ./NVIDIA-OptiX-SDK-7.1.0-linux64-x86_64.sh --skip-license --prefix=/optix --exclude-subdir
 
 # Copy over build script and set an entry point that
 # will use the compiler we want.
