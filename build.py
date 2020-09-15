@@ -60,7 +60,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument(
 	"--gafferVersion",
-	default = "0.57.4.0",
+	default = "0.58.1.0",
 	help = "The version of Gaffer to build against. "
 )
 
@@ -334,7 +334,6 @@ manifest = " ".join( [
 	"include/*",
 	"lib/*.cubin",
 	"lib/*.ptx",
-	"lib/libosdCPU*",
 	"lib/libGafferCycles*",
 	"license/*",
 	"python/*",
@@ -350,7 +349,8 @@ depCommands = [
 	"./build/build.py --project Gflags --gafferRoot {gafferRoot} --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx} && "
 	"./build/build.py --project Glog --gafferRoot {gafferRoot} --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx} && "
 	"./build/build.py --project Embree --gafferRoot {gafferRoot} --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx} && "
-	"./build/build.py --project OpenSubdiv --gafferRoot {gafferRoot} --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx}".format( 
+	"./build/build.py --project OpenSubdiv --gafferRoot {gafferRoot} --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx} && "
+	"./build/build.py --project OpenImageDenoise --gafferRoot {gafferRoot} --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx}".format( 
 		gafferCyclesRoot=gafferCyclesDirName, gafferRoot=gafferDirName, **formatVariables ),
 ]
 

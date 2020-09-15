@@ -34,6 +34,8 @@
 			" -D NO_GLFW=1"
 			" -D NO_GLFW_X11=1"
 			" -D GLEW_LOCATION={gafferRoot}"
+			" -D BUILD_SHARED_LIBS=0"
+			" -D NO_TBB=0"
 			" ..",
 		"cd gafferBuild && cmake --build . --config {cmakeBuildType} --target install",
 
