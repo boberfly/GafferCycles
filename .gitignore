@@ -10,3 +10,5 @@ dependencies/*/working
 .vscode
 NVIDIA-OptiX-SDK*
 /out
+build_local.sh
+NVIDIA-OptiX-SDK-7.1.0-linux64-x86_64.sh
