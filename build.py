@@ -60,7 +60,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument(
 	"--gafferVersion",
-	default = "0.59.5.0",
+	default = "0.59.6.0",
 	help = "The version of Gaffer to build against. "
 )
 
@@ -298,7 +298,7 @@ gafferDirName = os.path.abspath( gafferDirName )
 
 # Download GafferCycles
 
-gafferCyclesURL = "https://github.com/boberfly/GafferCycles/archive/{version}.tar.gz".format( **formatVariables )
+gafferCyclesURL = "https://github.com/kubo-von/GafferCycles/archive/refs/tags/0.22.2.tar.gz" #"https://github.com/boberfly/GafferCycles/archive/{version}.tar.gz".format( **formatVariables )
 sys.stderr.write( "Downloading GafferCycles \"%s\"\n" % gafferCyclesURL )
 
 gafferCyclesDirName = "gaffercycles-{version}-source".format( **formatVariables )
