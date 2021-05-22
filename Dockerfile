@@ -114,20 +114,20 @@ RUN yum install -y centos-release-scl && \
 RUN yum install -y wget && \
 #
 #
-# CUDA 11.0
+# CUDA 11.3.1
 #
-	wget -O cuda.rpm https://developer.download.nvidia.com/compute/cuda/11.0.3/local_installers/cuda-repo-rhel7-11-0-local-11.0.3_450.51.06-1.x86_64.rpm --progress=dot:mega \
+	wget -O cuda.rpm https://developer.download.nvidia.com/compute/cuda/11.3.1/local_installers/cuda-repo-rhel7-11-3-local-11.3.1_465.19.01-1.x86_64.rpm --progress=dot:mega \
 	&& rpm -i cuda.rpm && yum install -y cuda && rm cuda.rpm && \
 #
-# ISPC 1.14
+# ISPC 1.15
 #
-	wget -O ispc.tar.gz https://github.com/ispc/ispc/releases/download/v1.14.1/ispc-v1.14.1-linux.tar.gz -- \
+	wget -O ispc.tar.gz https://github.com/ispc/ispc/releases/download/v1.15.0/ispc-v1.15.0-linux.tar.gz -- \
 	&& mkdir /ispc && tar xf ispc.tar.gz -C /ispc --strip-components=1 && mv /ispc/bin/ispc /usr/bin/ispc && rm -rf /ispc
 
-# OptiX 7.1.0
+# OptiX 7.3.0
 
-COPY NVIDIA-OptiX-SDK-7.1.0-linux64-x86_64.sh /
-RUN mkdir /optix && ./NVIDIA-OptiX-SDK-7.1.0-linux64-x86_64.sh --skip-license --prefix=/optix --exclude-subdir
+COPY NVIDIA-OptiX-SDK-7.3.0-linux64-x86_64.sh /
+RUN mkdir /optix && ./NVIDIA-OptiX-SDK-7.3.0-linux64-x86_64.sh --skip-license --prefix=/optix --exclude-subdir
 
 # Copy over build script and set an entry point that
 # will use the compiler we want.

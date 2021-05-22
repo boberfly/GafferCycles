@@ -44,8 +44,8 @@ cd dependencies
 python ./build/build.py --project Gflags --buildDir $GAFFERCYCLES --forceCCompiler gcc-6 --forceCxxCompiler g++-6
 python ./build/build.py --project Glog --buildDir $GAFFERCYCLES --forceCCompiler gcc-6 --forceCxxCompiler g++-6
 python ./build/build.py --project Embree --buildDir $GAFFERCYCLES --gafferRoot $GAFFER_ROOT --forceCCompiler gcc-6 --forceCxxCompiler g++-6
-python ./build/build.py --project OpenSubdiv --buildDir $GAFFERCYCLES --gafferRoot $GAFFER_ROOT --forceCCompiler gcc-6 --forceCxxCompiler g++-6
 python ./build/build.py --project OpenImageDenoise --buildDir $GAFFERCYCLES --gafferRoot $GAFFER_ROOT --forceCCompiler gcc-6 --forceCxxCompiler g++-6
+python ./build/build.py --project NanoVDB --buildDir $GAFFERCYCLES
 cd ../build
 cmake -DCMAKE_CXX_COMPILER=g++-6 -DGAFFER_ROOT=$GAFFER_ROOT -DPYTHON_VARIANT=3 -DCMAKE_INSTALL_PREFIX=$GAFFERCYCLES -DWITH_CYCLES_EMBREE=ON -DWITH_CYCLES_OPENSUBDIV=ON -DWITH_CYCLES_LOGGING=ON ..
 make install -j <num cores>

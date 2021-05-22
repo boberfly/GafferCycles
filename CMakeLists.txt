@@ -14,7 +14,7 @@ add_compile_options("$<$<CONFIG:DEBUG>:-DWITH_CYCLES_DEBUG=1>")
 # Cycles Standalone
 set( WITH_CYCLES_STANDALONE_GUI  OFF CACHE INTERNAL "" )
 set( WITH_CYCLES_OSL             ON CACHE INTERNAL "" )
-set( OPENSUBDIV_ROOT_DIR         ${CMAKE_INSTALL_PREFIX} CACHE INTERNAL "" )
+set( OPENSUBDIV_ROOT_DIR         ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( EMBREE_ROOT_DIR             ${CMAKE_INSTALL_PREFIX} CACHE INTERNAL "" )
 set( BOOST_ROOT                  ${GAFFER_ROOT} CACHE INTERNAL "" )
 #set( LLVM_STATIC                 ON CACHE INTERNAL "" )
@@ -32,6 +32,7 @@ set( WITH_OPENVDB                ON CACHE INTERNAL "" )
 set( BLOSC_ROOT_DIR              ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( OPENVDB_ROOT_DIR            ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( TBB_ROOT_DIR                ${GAFFER_ROOT} CACHE INTERNAL "" )
+set( BUILD_WITH_REZ              OFF CACHE INTERNAL "" )
 if (MSVC)
     set( ZLIB_ROOT ${GAFFER_ROOT} CACHE INTERNAL "" )
     set( ZLIB_INCLUDE_DIRS ${GAFFER_ROOT}/include CACHE INTERNAL "" )
@@ -133,11 +134,16 @@ endif()
 find_package(OpenVDB REQUIRED)
 add_definitions( -DWITH_OPENVDB=1 -DWITH_OPENVDB_BLOSC=1 )
 
+if( WITH_NANOVDB )
+    find_package(NanoVDB REQUIRED)
+endif()
+
 if( WITH_CYCLES_LIGHTGROUPS )
     add_definitions( -DWITH_CYCLES_LIGHTGROUPS=1 )
 endif()
 
 if( WITH_OPENIMAGEDENOISE )
+    find_package(OpenImageDenoise REQUIRED)
     add_definitions( -DWITH_OPENIMAGEDENOISE=1 )
 endif()
 
@@ -237,8 +243,9 @@ target_link_libraries(GafferCycles
     ${OPENVDB_LIBRARIES}
     ${GLOG_LIBRARIES}
     ${GFLAGS_LIBRARIES}
+    ${OPENIMAGEDENOISE_LIBRARIES}
     )
-add_dependencies( GafferCycles cycles )
+add_dependencies( GafferCycles Cycles )
 
 install(TARGETS GafferCycles DESTINATION lib)
 install(FILES ${GAFFERCYCLES_H_FILES}

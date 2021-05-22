@@ -2,11 +2,18 @@
 
 	"downloads" : [
 
-		"https://github.com/OpenImageDenoise/oidn/releases/download/v1.2.3/oidn-1.2.3.src.tar.gz"
+		"https://github.com/OpenImageDenoise/oidn/releases/download/v1.4.0/oidn-1.4.0.src.tar.gz"
 
 	],
 
 	"license" : "LICENSE.txt",
+
+	"environment" : {
+
+		"PATH" : "{buildDir}/bin:$PATH",
+		"LD_LIBRARY_PATH" : "{buildDir}/lib:$LD_LIBRARY_PATH",
+
+	},
 
 	"commands" : [
 
@@ -29,6 +36,36 @@
 		"static" : "OIDN_STATIC_LIB=ON",
 		"shared" : "OIDN_STATIC_LIB=OFF",
 		"default" : "OIDN_STATIC_LIB=ON",
+
+	},
+
+	"platform:linux" : {
+
+		"environment" : {
+
+			"LD_LIBRARY_PATH" : "{gafferRoot}/lib:$LD_LIBRARY_PATH",
+
+		},
+
+	},
+
+	"platform:osx" : {
+
+		"environment" : {
+
+			"LD_LIBRARY_PATH" : "{gafferRoot}/lib:$LD_LIBRARY_PATH",
+
+		},
+
+	},
+
+	"platform:windows" : {
+
+		"environment" : {
+
+			"PATH" : "{gafferRoot}/lib;%PATH",
+
+		},
 
 	},
 
