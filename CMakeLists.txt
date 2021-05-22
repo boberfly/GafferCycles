@@ -263,9 +263,11 @@ target_link_libraries(GafferCyclesModule
     ${GLOG_LIBRARIES}
     ${GFLAGS_LIBRARIES}
     )
+string(REPLACE "2" "python2.7" PYTHON_FOLDER ${PYTHON_VARIANT})
+string(REPLACE "3" "python3.7m" PYTHON_FOLDER ${PYTHON_FOLDER})
 target_include_directories(GafferCyclesModule PRIVATE 
     include ${GAFFER_ROOT}/include 
-    ${GAFFER_ROOT}/include/python2.7 
+    ${GAFFER_ROOT}/include/${PYTHON_FOLDER}
     ${CYCLES_INCLUDE_DIR}
     ${EMBREE_INCLUDE_DIRS}
     )
