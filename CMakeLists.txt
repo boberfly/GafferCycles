@@ -147,6 +147,10 @@ if( WITH_OPENIMAGEDENOISE )
     add_definitions( -DWITH_OPENIMAGEDENOISE=1 )
 endif()
 
+if( WITH_CYCLES_SDF )
+    add_definitions( -DWITH_CYCLES_SDF=1 )
+endif()
+
 set(CMAKE_CXX_STANDARD 11)
 
 link_directories( ${GAFFER_ROOT}/lib )

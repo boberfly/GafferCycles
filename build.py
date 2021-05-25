@@ -383,6 +383,7 @@ commands = [
 		" -D WITH_CYCLES_LIGHTGROUPS=ON"
 		" -D WITH_OPENIMAGEDENOISE=ON"
 		" -D WITH_NANOVDB=ON"
+		" -D WITH_CYCLES_SDF=ON"
 		" -D PYTHON_VARIANT={pythonVariant}"
 		" ../..".format( gafferCyclesRoot=gafferCyclesDirName, gafferRoot=gafferDirName, withOptix=withOptix, withExperimental=str( int( formatVariables["experimental"] ) ), **formatVariables ),
 
