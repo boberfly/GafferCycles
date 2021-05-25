@@ -166,6 +166,7 @@ set(IECORECYCLES_CXX_FILES
     ${IECORECYCLES_SRC_DIR}/PointsAlgo.cpp
     ${IECORECYCLES_SRC_DIR}/ShaderNetworkAlgo.cpp
     ${IECORECYCLES_SRC_DIR}/SocketAlgo.cpp
+    ${IECORECYCLES_SRC_DIR}/SphereAlgo.cpp
     ${IECORECYCLES_SRC_DIR}/Renderer.cpp
     ${IECORECYCLES_SRC_DIR}/VDBAlgo.cpp
     ${IECORECYCLES_SRC_DIR}/Mikktspace/mikktspace.c
@@ -183,6 +184,7 @@ set(IECORECYCLES_H_FILES
     ${IECORECYCLES_INCLUDE_DIR}/PointsAlgo.h
     ${IECORECYCLES_INCLUDE_DIR}/ShaderNetworkAlgo.h
     ${IECORECYCLES_INCLUDE_DIR}/SocketAlgo.h
+    ${IECORECYCLES_INCLUDE_DIR}/SphereAlgo.h
     ${IECORECYCLES_INCLUDE_DIR}/VDBAlgo.h
     )
 # GafferCycles
