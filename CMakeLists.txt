@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_CXX_STANDARD 14)
 
 # VFX Plarform requirement when using GCC 6.3.x
 add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
@@ -150,8 +151,6 @@ endif()
 if( WITH_CYCLES_SDF )
     add_definitions( -DWITH_CYCLES_SDF=1 )
 endif()
-
-set(CMAKE_CXX_STANDARD 11)
 
 link_directories( ${GAFFER_ROOT}/lib )
 
