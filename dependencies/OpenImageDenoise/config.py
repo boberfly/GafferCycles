@@ -2,7 +2,7 @@
 
 	"downloads" : [
 
-		"https://github.com/OpenImageDenoise/oidn/releases/download/v1.4.0/oidn-1.4.0.src.tar.gz"
+		"https://github.com/OpenImageDenoise/oidn/releases/download/v1.4.1/oidn-1.4.1.src.tar.gz"
 
 	],
 
