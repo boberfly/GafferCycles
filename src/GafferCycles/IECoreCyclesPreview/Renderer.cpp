@@ -116,6 +116,10 @@
 #include "util/util_time.h"
 #include "util/util_vector.h"
 
+#include <OpenImageIO/imageio.h>
+#include <OpenImageIO/deepdata.h>
+#include <OpenImageIO/imagebuf.h>
+
 using namespace std;
 using namespace Imath;
 using namespace IECore;
@@ -242,6 +246,7 @@ ccl::PassType nameToPassType( const std::string &name )
 #ifdef WITH_CYCLES_LIGHTGROUPS
 	MAP_PASS_STARTSWITH( "lightgroup", ccl::PASS_LIGHTGROUP );
 #endif
+	MAP_PASS( "deep", ccl::PASS_DEEP );
 #undef MAP_PASS
 #undef MAP_PASS_STARTSWITH
 
@@ -380,7 +385,7 @@ class CyclesOutput : public IECore::RefCounted
 
 	public :
 
-		CyclesOutput( const IECoreScene::Output *output, const ccl::Scene *scene = nullptr ) : m_denoisingPassOffsets( -1 )
+		CyclesOutput( const IECoreScene::Output *output, const ccl::Session *session = nullptr ) : m_denoisingPassOffsets( -1 )
 		{
 			m_name = output->getName();
 			m_type = output->getType();
@@ -388,10 +393,15 @@ class CyclesOutput : public IECore::RefCounted
 			m_passType = nameToPassType( m_data );
 			m_denoisingPassOffsets = nameToDenoisePassType( m_data );
 
+			if( m_type == "ieDisplay" )
+				m_interactive = true;
+			else
+				m_interactive = false;
+
 			m_instances = parameter<int>( output->parameters(), "instances", 1 );
-			if( scene && m_passType == ccl::PASS_CRYPTOMATTE )
+			if( session && m_passType == ccl::PASS_CRYPTOMATTE )
 			{
-				m_instances = scene->film->get_cryptomatte_depth();
+				m_instances = session->scene->film->get_cryptomatte_depth();
 			}
 
 			if( ( m_passType == ccl::PASS_AOV_COLOR ) || ( m_passType == ccl::PASS_AOV_VALUE ) )
@@ -409,10 +419,13 @@ class CyclesOutput : public IECore::RefCounted
 				m_components = passComponents( m_passType );
 			}
 			m_parameters = output->parametersData()->copy();
-			if( m_type == "ieDisplay" )
-				m_interactive = true;
-			else
-				m_interactive = false;
+
+			/* OpenImageIO */
+			if( !m_interactive && session && m_passType == ccl::PASS_DEEP )
+			{
+				m_tileWidth = session->params.tile_size.x;
+				m_tileHeight = session->params.tile_size.y;
+			}
 
 			const vector<int> quantize = parameter<vector<int>>( output->parameters(), "quantize", { 0, 0, 0, 0 } );
 			if( quantize == vector<int>( { 0, 255, 0, 255 } ) )
@@ -429,9 +442,11 @@ class CyclesOutput : public IECore::RefCounted
 			}
 		}
 
-		void createImage( ccl::Camera *camera )
+		void createImage( ccl::Scene *scene )
 		{
 			m_images.clear();
+
+			ccl::Camera *camera = scene->camera;
 
 			//ccl::DisplayBuffer &display = m_session->display;
 			// TODO: Work out if Cycles can do overscan...
@@ -447,6 +462,78 @@ class CyclesOutput : public IECore::RefCounted
 				V2i( (int)(camera->get_border_right()  * (float)width ) - 1,
 					 (int)(camera->get_border_top()    * (float)height - 1 ) )
 				);
+
+			/* OpenImageIO */
+			if( !m_interactive && m_passType == ccl::PASS_DEEP )
+			{
+				constexpr bool scanline = false;
+
+				m_spec.width = m_spec.full_width = width;
+				m_spec.height = m_spec.full_height = height;
+				m_spec.x = m_spec.y = m_spec.z = 0;
+				m_spec.depth = m_spec.full_depth = 1;
+				m_spec.tile_width = m_tileWidth;
+				m_spec.tile_height = m_tileHeight;
+				m_spec.tile_depth = 1;
+
+				if (scanline)
+				{
+					m_spec.tile_width = m_spec.tile_height = m_spec.tile_depth = 0;
+				}
+
+				m_spec.deep = true;
+
+				ccl::DeepType passes = scene->film->get_deep_passes();
+
+				m_spec.channelnames.push_back( "Z" );
+				m_spec.channelnames.push_back( "ZBack" );
+				m_spec.channelformats.push_back( OIIO::TypeDesc::FLOAT );
+				m_spec.channelformats.push_back( OIIO::TypeDesc::FLOAT );
+				m_spec.nchannels = 2;
+				m_spec.z_channel = 0;
+
+				if( passes == ccl::DEEP_ALPHA )
+				{
+					m_spec.alpha_channel = m_spec.nchannels;
+					m_spec.channelnames.push_back( "A" );
+					m_spec.channelformats.push_back( OIIO::TypeDesc::HALF );
+					m_spec.nchannels += 1;
+				}
+				else if( passes == ccl::DEEP_COLOR_ALPHA )
+				{
+					m_spec.channelnames.push_back( "R" );
+					m_spec.channelnames.push_back( "G" );
+					m_spec.channelnames.push_back( "B" );
+					m_spec.channelnames.push_back( "A" );
+					m_spec.channelformats.push_back( OIIO::TypeDesc::HALF );
+					m_spec.channelformats.push_back( OIIO::TypeDesc::HALF );
+					m_spec.channelformats.push_back( OIIO::TypeDesc::HALF );
+					m_spec.channelformats.push_back( OIIO::TypeDesc::HALF );
+					m_spec.nchannels += 4;
+				}
+				else if( passes == ccl::DEEP_COLOR_RGB_OPACITY )
+				{
+					m_spec.channelnames.push_back( "R" );
+					m_spec.channelnames.push_back( "G" );
+					m_spec.channelnames.push_back( "B" );
+					m_spec.channelnames.push_back( "AR" );
+					m_spec.channelnames.push_back( "AG" );
+					m_spec.channelnames.push_back( "AB" );
+					m_spec.channelformats.push_back( OIIO::TypeDesc::HALF );
+					m_spec.channelformats.push_back( OIIO::TypeDesc::HALF );
+					m_spec.channelformats.push_back( OIIO::TypeDesc::HALF );
+					m_spec.channelformats.push_back( OIIO::TypeDesc::HALF );
+					m_spec.channelformats.push_back( OIIO::TypeDesc::HALF );
+					m_spec.channelformats.push_back( OIIO::TypeDesc::HALF );
+					m_spec.nchannels += 6;
+				}
+
+				OIIO::ustring output = OIIO::ustring::format(m_name.c_str());
+				m_deepOut = OIIO::ImageOutput::create(output.c_str());
+				m_deepOut->open(output.c_str(), m_spec);
+
+				return;
+			}
 
 			vector<string> channelNames;
 
@@ -531,6 +618,11 @@ class CyclesOutput : public IECore::RefCounted
 				writer->write();
 				return;
 			}
+			else if( m_passType == ccl::PASS_DEEP && m_deepOut )
+			{
+				m_deepOut->close();
+				return;
+			}
 
 			for( auto image : m_images )
 			{
@@ -573,6 +665,11 @@ class CyclesOutput : public IECore::RefCounted
 		int m_components;
 		bool m_interactive;
 		int m_instances;
+		// Deep
+		OIIO::ImageSpec m_spec;
+		std::unique_ptr<OIIO::ImageOutput> m_deepOut;
+		int m_tileWidth;
+		int m_tileHeight;
 };
 
 IE_CORE_DECLAREPTR( CyclesOutput )
@@ -806,6 +903,146 @@ class RenderCallback : public IECore::RefCounted
 							outChannelOffset = interleave( &tileData[0], w, h, numChannels, numOutputChannels, outChannelOffset, &interleavedData[0] );
 						else
 							output.second->m_images[i]->imageData( tile, &tileData[0], w * h * numChannels );
+					}
+				}
+				else if( output.second->m_passType == ccl::PASS_DEEP && !m_interactive )
+				{
+					if (rtile.deep_buffer.size())
+					{
+						constexpr bool scanline = false;
+
+						ccl::Film *film = m_session->scene->film;
+
+						OIIO::ImageSpec spec = output.second->m_spec;
+						spec.width = spec.full_width = rtile.w;
+						spec.height = spec.full_height = rtile.h;
+						spec.x = spec.y = spec.z = 0;
+						spec.depth = spec.full_depth = 1;
+						spec.tile_width = rtile.w;
+						spec.tile_height = rtile.h;
+						spec.tile_depth = 1;
+
+						float tolerance = film->get_depth_tolerance();
+						ccl::DeepType passes = film->get_deep_passes();
+						OIIO::DeepData deep_data(spec);
+						for (int y = 0; y < rtile.h; y++)
+						{
+							for (int x = 0; x < rtile.w; x++)
+							{
+								int idx = y * rtile.w + x;
+								float accum = 0.0f;
+								if(!rtile.deep_buffer[idx].size()) // || (rtile.deep_buffer[idx][0].object == -1))
+								{
+									continue;
+								}
+								std::sort(rtile.deep_buffer[idx].begin(), rtile.deep_buffer[idx].end(), [](const ccl::DeepPixel &a, const ccl::DeepPixel &b) {return a.depth_near > b.depth_near; });
+
+								int size = 0;
+								std::vector<ccl::DeepPixel> pixels(rtile.deep_buffer[idx].size());
+								pixels[0] = rtile.deep_buffer[idx][0];
+								if( tolerance > 0.0f )
+								{
+									for (int s = 1; s < rtile.deep_buffer[idx].size(); ++s)
+									{
+										if ((tolerance < fabsf(pixels[size].depth_near - rtile.deep_buffer[idx][s].depth_near)) || (rtile.deep_buffer[idx][s].object != pixels[size].object))// || ccl::dot(rtile.deep_buffer[idx][s].N, pixel.N) > 0.0f)
+										{
+											// Add sample
+											++size;
+											pixels[size].value = rtile.deep_buffer[idx][s].value;
+											pixels[size].alpha = rtile.deep_buffer[idx][s].alpha;
+											pixels[size].N = rtile.deep_buffer[idx][s].N;
+											pixels[size].depth_near = rtile.deep_buffer[idx][s].depth_near;
+											pixels[size].depth_far = rtile.deep_buffer[idx][s].depth_far;
+											pixels[size].object = rtile.deep_buffer[idx][s].object;
+											pixels[size].prim = rtile.deep_buffer[idx][s].prim;
+											pixels[size].sample_count = rtile.deep_buffer[idx][s].sample_count;
+										}
+										else
+										{
+											// Merge sample to previous
+											pixels[size].depth_near = rtile.deep_buffer[idx][s].depth_near;
+											pixels[size].depth_far = rtile.deep_buffer[idx][s].depth_far;
+											pixels[size].value += rtile.deep_buffer[idx][s].value;
+											pixels[size].alpha += rtile.deep_buffer[idx][s].alpha;
+											pixels[size].sample_count += rtile.deep_buffer[idx][s].sample_count;
+										}
+									}
+									size += 1;
+									//pixels.resize(size+1);
+								}
+								else
+								{
+									pixels = rtile.deep_buffer[idx];
+									size = rtile.deep_buffer[idx].size();
+								}
+								//int size = rtile.deep_buffer[idx].size();
+								//rtile.deep_buffer[idx] = deep_buffer;
+								//deep_data.set_samples(idx, rtile.deep_buffer[idx].size());
+								deep_data.set_samples(idx, size);
+
+								ccl::float3 alpha_sum = ccl::make_float3( 0.0f, 0.0f, 0.0f );
+								for (int s = size -1; s > -1; --s)
+								{
+									int channel = 0;
+									deep_data.set_deep_value( idx, channel,   s, pixels[s].depth_near );
+									deep_data.set_deep_value( idx, channel+1, s, pixels[s].depth_far );
+									channel += 2;
+
+									float inv_sample_count = 1.0f / ( rtile.num_samples - rtile.start_sample );
+									ccl::float3 alpha_prev_sum = alpha_sum;
+									alpha_sum += ccl::make_float3( pixels[s].alpha.x * inv_sample_count, pixels[s].alpha.y * inv_sample_count, pixels[s].alpha.z * inv_sample_count );
+									ccl::float3 alpha_sample = ccl::make_float3( 1.0f - ( 1.0f - alpha_sum.x ) / ( 1.0f - alpha_prev_sum.x ),
+																				 1.0f - ( 1.0f - alpha_sum.y ) / ( 1.0f - alpha_prev_sum.y ),
+																				 1.0f - ( 1.0f - alpha_sum.z ) / ( 1.0f - alpha_prev_sum.z ) );
+
+									if( passes == ccl::DEEP_ALPHA )
+									{
+										deep_data.set_deep_value( idx, channel, s, ccl::average( alpha_sample ) );
+									}
+									else if( passes == ccl::DEEP_COLOR_ALPHA )
+									{
+										float alpha_sample_avg = ccl::average( alpha_sample );
+										ccl::float3 value_sample = ccl::make_float3( pixels[s].value.x / pixels[s].sample_count * alpha_sample_avg, 
+																					 pixels[s].value.y / pixels[s].sample_count * alpha_sample_avg, 
+																					 pixels[s].value.z / pixels[s].sample_count * alpha_sample_avg );
+										deep_data.set_deep_value( idx, channel,   s, value_sample.x );
+										deep_data.set_deep_value( idx, channel+1, s, value_sample.y );
+										deep_data.set_deep_value( idx, channel+2, s, value_sample.z );
+										deep_data.set_deep_value( idx, channel+3, s, alpha_sample_avg );
+									}
+									else if( passes == ccl::DEEP_COLOR_RGB_OPACITY )
+									{
+										ccl::float3 value_sample = ccl::make_float3( pixels[s].value.x / pixels[s].sample_count * alpha_sample.x, 
+																					 pixels[s].value.y / pixels[s].sample_count * alpha_sample.y, 
+																					 pixels[s].value.z / pixels[s].sample_count * alpha_sample.z );
+										deep_data.set_deep_value( idx, channel,   s, value_sample.x );
+										deep_data.set_deep_value( idx, channel+1, s, value_sample.y );
+										deep_data.set_deep_value( idx, channel+2, s, value_sample.z );
+										deep_data.set_deep_value( idx, channel+3, s, alpha_sample.x );
+										deep_data.set_deep_value( idx, channel+4, s, alpha_sample.y );
+										deep_data.set_deep_value( idx, channel+5, s, alpha_sample.z );
+									}
+								}
+							}
+						}
+
+						if (scanline)
+						{
+							output.second->m_deepOut->write_deep_scanlines(rtile.y ,rtile.y + rtile.h, 0, deep_data);
+						}
+						else
+						{
+							int xbegin = rtile.x;
+							int xend = rtile.x + rtile.w;
+							int ybegin = rtile.y;
+							int yend = rtile.y + rtile.h;
+
+							bool result = output.second->m_deepOut->write_deep_tiles( xbegin, xend, ybegin, yend, 0, 1, deep_data );
+							if (!result)
+							{
+								IECore::msg( IECore::Msg::Error, "CyclesRenderer::CyclesOutput", output.second->m_deepOut->geterror() );
+							}
+						}
 					}
 				}
 				else
@@ -3862,8 +4099,12 @@ class CyclesRenderer final : public IECoreScenePreview::Renderer
 					const auto coutput = m_outputs.find( name );
 					if( coutput == m_outputs.end() )
 					{
-						m_outputs[name] = new CyclesOutput( output, m_scene );
+						m_outputs[name] = new CyclesOutput( output, m_session );
 					}
+				}
+				else if( passType == ccl::PASS_DEEP )
+				{
+					m_outputs[name] = new CyclesOutput( output, m_session );
 				}
 				else
 				{
@@ -4519,7 +4760,7 @@ class CyclesRenderer final : public IECoreScenePreview::Renderer
 				for( auto &output : m_outputs )
 				{
 					CyclesOutput *co = output.second.get();
-					co->createImage( cam );
+					co->createImage( m_scene );
 				}
 			}
 		}

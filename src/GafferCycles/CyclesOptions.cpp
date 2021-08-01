@@ -105,6 +105,9 @@ CyclesOptions::CyclesOptions( const std::string &name )
 	options->addChild( new Gaffer::NameValuePlug( "ccl:film:denoising_transmission_direct",   new IECore::BoolData( true ), false, "denoisingTransmissionDirect" ) );
 	options->addChild( new Gaffer::NameValuePlug( "ccl:film:denoising_transmission_indirect", new IECore::BoolData( true ), false, "denoisingTransmissionIndirect" ) );
 
+	options->addChild( new Gaffer::NameValuePlug( "ccl:film:deep_passes", new IECore::IntData( 0 ), false, "deepPasses" ) );
+	options->addChild( new Gaffer::NameValuePlug( "ccl:film:depth_tolerance", new IECore::FloatData( 0.005f ), false, "depthTolerance" ) );
+
 	// Scene/BVH
 
 	//options->addChild( new Gaffer::NameValuePlug( "ccl:scene:bvh_type", new IECore::IntData( 0 ), false, "bvhType" ) );

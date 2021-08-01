@@ -314,6 +314,12 @@ def __filmSummary( plug ) :
 	if plug["cryptomatteDepth"]["enabled"].getValue() :
 		info.append( "Cryptomatte Depth {}".format( plug["cryptomatteDepth"]["value"].getValue() ) )
 
+	if plug["deepPasses"]["enabled"].getValue() :
+		info.append( "Deep Passes {}".format( plug["deepPasses"]["value"].getValue() ) )
+
+	if plug["depthTolerance"]["enabled"].getValue() :
+		info.append( "Depth Tolerance {}".format( plug["depthTolerance"]["value"].getValue() ) )
+
 	return ", ".join( info )
 
 def __denoisingSummary( plug ) :
@@ -1710,6 +1716,41 @@ Gaffer.Metadata.registerNode(
 			"description",
 			"""
 			Sets how many unique objects can be distinguished per pixel.
+			""",
+
+			"layout:section", "Film",
+
+		],
+
+		"options.deepPasses" : [
+
+			"description",
+			"""
+			Set what deep passes to render.
+			Alpha - Alpha-only, useful if a deepRecolor will be used instead.
+			Color Alpha - Color with single alpha opacity.
+			Color RGB Opacity - Color with separate channels for opacity.
+			""",
+
+			"layout:section", "Film",
+
+		],
+
+		"options.deepPasses.value" : [
+
+			"preset:Alpha", 0,
+			"preset:Color Alpha", 1,
+			"preset:Color RGB Opacity", 2,
+
+			"plugValueWidget:type", "GafferUI.PresetsPlugValueWidget",
+
+		],
+
+		"options.depthTolerance" : [
+
+			"description",
+			"""
+			Depth tolerance where deep samples get merged.
 			""",
 
 			"layout:section", "Film",

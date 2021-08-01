@@ -89,6 +89,7 @@ with IECore.IgnoredExceptions( ImportError ) :
 		"aov_color",
 		"aov_value",
 		"lightgroups",
+		"deep",
 	] :
 
 		label = aov.replace( "_", " " ).title().replace( " ", "_" )
