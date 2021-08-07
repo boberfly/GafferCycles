@@ -9,7 +9,6 @@ import subprocess
 import shutil
 import sys
 import tarfile
-import urllib
 import zipfile
 
 def __projects() :
@@ -167,8 +166,9 @@ def __buildProject( project, gafferRoot, buildDir, buildType, forceLibLinkType, 
 		if os.path.exists( archivePath ) :
 			continue
 
-		sys.stderr.write( "Downloading {}".format( download ) + "\n" )
-		urllib.urlretrieve( download, archivePath )
+		downloadCommand = "curl -L {0} > {1}".format( download, archivePath )
+		sys.stderr.write( downloadCommand + "\n" )
+		subprocess.check_call( downloadCommand, shell = True )
 
 	workingDir = project + "/working"
 	if os.path.exists( workingDir ) :
