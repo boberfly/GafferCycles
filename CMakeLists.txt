@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # VFX Plarform requirement when using GCC 6.3.x
 add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
@@ -176,6 +176,10 @@ set(IECORECYCLES_CXX_FILES
     ${IECORECYCLES_SRC_DIR}/VDBAlgo.cpp
     ${IECORECYCLES_SRC_DIR}/Mikktspace/mikktspace.c
     ${IECORECYCLES_SRC_DIR}/Mikktspace/mikktspace.h
+    ${IECORECYCLES_SRC_DIR}/outputDriver/IEDisplayOutputDriver.cpp
+    ${IECORECYCLES_SRC_DIR}/outputDriver/IEDisplayOutputDriver.h
+    ${IECORECYCLES_SRC_DIR}/outputDriver/OIIOOutputDriver.cpp
+    ${IECORECYCLES_SRC_DIR}/outputDriver/OIIOOutputDriver.h
     )
 set(IECORECYCLES_H_FILES
     ${IECORECYCLES_INCLUDE_DIR}/AttributeAlgo.h
@@ -254,7 +258,7 @@ target_link_libraries(GafferCycles
     ${GFLAGS_LIBRARIES}
     ${OPENIMAGEDENOISE_LIBRARIES}
     )
-add_dependencies( GafferCycles Cycles )
+add_dependencies( GafferCycles cycles )
 
 install(TARGETS GafferCycles DESTINATION lib)
 install(FILES ${GAFFERCYCLES_H_FILES}
