@@ -53,14 +53,19 @@ set(CYCLES_LIBRARIES
     cycles_bvh
     cycles_device
     cycles_graph
+    cycles_integrator
     cycles_kernel_osl
     cycles_kernel
-    cycles_render
+    cycles_scene
+    cycles_session
     cycles_subd
     cycles_util
     extern_clew
     extern_cuew
+    extern_hipew
+    extern_libc_compat
     extern_numaapi
+    extern_sky
     )
 
 set(CYCLES_INCLUDE_DIR 
@@ -152,6 +157,10 @@ endif()
 
 if( WITH_CYCLES_SDF )
     add_definitions( -DWITH_CYCLES_SDF=1 )
+endif()
+
+if( WITH_CYCLES_CORNER_NORMALS )
+    add_definitions( -DWITH_CYCLES_CORNER_NORMALS=1 )
 endif()
 
 link_directories( ${GAFFER_ROOT}/lib )
