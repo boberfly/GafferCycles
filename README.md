@@ -87,7 +87,7 @@ If you have docker correctly installed, this should make a CentOS 7-based image,
 ```
 Alternatively, you can build with Nvidia OptiX support. You must download OptiX and copy it to this directory which needs to be named:
 ```
-NVIDIA-OptiX-SDK-7.3.0-linux64.sh
+NVIDIA-OptiX-SDK-7.4.0-linux64-x86_64.sh
 ```
 And run:
 ```

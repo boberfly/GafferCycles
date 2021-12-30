@@ -44,7 +44,7 @@ RUN yum install -y centos-release-scl && \
 	yum install -y cmake3 && \
 	ln -s /usr/bin/cmake3 /usr/bin/cmake && \
 #
-	pip install scons==3.1.52 && \
+	pip install scons==3.1.2 && \
 #
 	yum install -y \
 		git \
@@ -119,23 +119,23 @@ RUN yum install -y centos-release-scl && \
 # correct version will already be installed and we just ignore this...
 #	./versionlock.sh lock-new /tmp/packages
 
-RUN yum install -y wget && \
+RUN yum install -y wget
 #
 #
 # CUDA 11.3.1
 #
-	wget -O cuda.rpm https://developer.download.nvidia.com/compute/cuda/11.5.1/local_installers/cuda-repo-rhel7-11-5-local-11.5.1_495.29.05-1.x86_64.rpm --progress=dot:mega \
-	&& rpm -i cuda.rpm && yum install -y cuda && rm cuda.rpm && \
+RUN	wget -O cuda.rpm https://developer.download.nvidia.com/compute/cuda/11.5.1/local_installers/cuda-repo-rhel7-11-5-local-11.5.1_495.29.05-1.x86_64.rpm --progress=dot:mega \
+	&& rpm -i cuda.rpm && yum install -y cuda && rm cuda.rpm
 #
 # ISPC 1.15
 #
-	wget -O ispc.tar.gz https://github.com/ispc/ispc/releases/download/v1.15.0/ispc-v1.15.0-linux.tar.gz -- \
+RUN wget -O ispc.tar.gz https://github.com/ispc/ispc/releases/download/v1.16.1/ispc-v1.16.1-linux.tar.gz -- \
 	&& mkdir /ispc && tar xf ispc.tar.gz -C /ispc --strip-components=1 && mv /ispc/bin/ispc /usr/bin/ispc && rm -rf /ispc
 
 # OptiX 7.4.0
 
 COPY NVIDIA-OptiX-SDK-7.4.0-linux64-x86_64.sh /
-RUN mkdir /optix && ./NVIDIA-OptiX-SDK-7.4.0-linux64-x86_64.sh --skip-license --prefix=/optix --exclude-subdir
+RUN mkdir /optix && chmod +x NVIDIA-OptiX-SDK-7.4.0-linux64-x86_64.sh && ./NVIDIA-OptiX-SDK-7.4.0-linux64-x86_64.sh --skip-license --prefix=/optix --exclude-subdir
 
 # Copy over build script and set an entry point that
 # will use the compiler we want.

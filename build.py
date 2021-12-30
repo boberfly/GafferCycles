@@ -359,7 +359,7 @@ depCommands = [
 	"./build/build.py --project Embree --gafferRoot {gafferRoot} --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx} && "
 	"./build/build.py --project OpenImageDenoise --gafferRoot {gafferRoot} --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx} && "
 	"./build/build.py --project NanoVDB --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} && "\
-	"./build/build.py --project PugiXML --buildDir {gafferCyclesRoot} --gafferRoot {gafferRoot}".format( 
+	"./build/build.py --project PugiXML --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --gafferRoot {gafferRoot}".format( 
 		gafferCyclesRoot=gafferCyclesDirName, gafferRoot=gafferDirName, **formatVariables ),
 ]
 
