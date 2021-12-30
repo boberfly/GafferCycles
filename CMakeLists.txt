@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_STANDARD 17)
 
-# VFX Plarform requirement when using GCC 6.3.x
+# VFX Plarform requirement
 add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 
 # Silence deprecation warning (Gaffer uses this)
@@ -34,7 +34,7 @@ set( BLOSC_ROOT_DIR              ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( OPENVDB_ROOT_DIR            ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( TBB_ROOT_DIR                ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( BUILD_WITH_REZ              OFF CACHE INTERNAL "" )
-set( PUGIXML_ROOT_DIR            ${GAFFER_ROOT} CACHE INTERNAL "" )
+set( PUGIXML_ROOT_DIR            ${CMAKE_INSTALL_PREFIX} CACHE INTERNAL "" )
 if (MSVC)
     set( ZLIB_ROOT ${GAFFER_ROOT} CACHE INTERNAL "" )
     set( ZLIB_INCLUDE_DIRS ${GAFFER_ROOT}/include CACHE INTERNAL "" )

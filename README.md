@@ -39,7 +39,7 @@ git clone --recurse-submodules https://github.com/boberfly/GafferCycles.git
 cd GafferCycles
 mkdir build
 cd build
-cmake -DCMAKE_CXX_COMPILER=g++-6 -DGAFFER_ROOT=$GAFFER_ROOT -DPYTHON_VARIANT=3 -DCMAKE_INSTALL_PREFIX=$GAFFERCYCLES ..
+cmake -DGAFFER_ROOT=$GAFFER_ROOT -DPYTHON_VARIANT=3 -DCMAKE_INSTALL_PREFIX=$GAFFERCYCLES ..
 make install -j <num cores>
 ```
 
@@ -48,14 +48,14 @@ make install -j <num cores>
 Run this after cloning the git repo and before building
 ```
 cd dependencies
-python ./build/build.py --project Gflags --buildDir $GAFFERCYCLES --forceCCompiler gcc-6 --forceCxxCompiler g++-6
-python ./build/build.py --project Glog --buildDir $GAFFERCYCLES --forceCCompiler gcc-6 --forceCxxCompiler g++-6
-python ./build/build.py --project Embree --buildDir $GAFFERCYCLES --gafferRoot $GAFFER_ROOT --forceCCompiler gcc-6 --forceCxxCompiler g++-6
-python ./build/build.py --project OpenImageDenoise --buildDir $GAFFERCYCLES --gafferRoot $GAFFER_ROOT --forceCCompiler gcc-6 --forceCxxCompiler g++-6
+python ./build/build.py --project Gflags --buildDir $GAFFERCYCLES
+python ./build/build.py --project Glog --buildDir $GAFFERCYCLES
+python ./build/build.py --project Embree --buildDir $GAFFERCYCLES --gafferRoot $GAFFER_ROOT
+python ./build/build.py --project OpenImageDenoise --buildDir $GAFFERCYCLES --gafferRoot $GAFFER_ROOT
 python ./build/build.py --project NanoVDB --buildDir $GAFFERCYCLES
-python ./build/build.py --project PugiXML --buildDir $GAFFERCYCLES --gafferRoot $GAFFER_ROOT --forceCCompiler gcc-6 --forceCxxCompiler g++-6
+python ./build/build.py --project PugiXML --buildDir $GAFFERCYCLES --gafferRoot $GAFFER_ROOT
 cd ../build
-cmake -DCMAKE_CXX_COMPILER=g++-6 -DGAFFER_ROOT=$GAFFER_ROOT -DPYTHON_VARIANT=3 -DCMAKE_INSTALL_PREFIX=$GAFFERCYCLES -DWITH_CYCLES_EMBREE=ON -DWITH_CYCLES_OPENSUBDIV=ON -DWITH_CYCLES_LOGGING=ON -DWITH_CYCLES_LIGHTGROUPS=ON -DWITH_CYCLES_TEXTURE_CACHE=ON ..
+cmake -DGAFFER_ROOT=$GAFFER_ROOT -DPYTHON_VARIANT=3 -DCMAKE_INSTALL_PREFIX=$GAFFERCYCLES -DWITH_CYCLES_EMBREE=ON -DWITH_CYCLES_OPENSUBDIV=ON -DWITH_CYCLES_LOGGING=ON -DWITH_CYCLES_LIGHTGROUPS=ON -DWITH_CYCLES_CORNER_NORMALS=ON ..
 make install -j <num cores>
 ```
 For CUDA support, make sure it is installed and ```WITH_CYCLES_DEVICE_CUDA=ON``` added to the cmake line.
