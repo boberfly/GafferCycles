@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.0)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
-# VFX Plarform requirement when using GCC 6.3.x
+# VFX Plarform requirement
 add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 
 # Silence deprecation warning (Gaffer uses this)
@@ -15,25 +15,26 @@ add_compile_options("$<$<CONFIG:DEBUG>:-DWITH_CYCLES_DEBUG=1>")
 # Cycles Standalone
 set( WITH_CYCLES_STANDALONE_GUI  OFF CACHE INTERNAL "" )
 set( WITH_CYCLES_OSL             ON CACHE INTERNAL "" )
+set( WITH_CYCLES_OPENCOLORIO     ON CACHE INTERNAL "" )
+set( OPENCOLORIO_ROOT_DIR        ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( OPENSUBDIV_ROOT_DIR         ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( EMBREE_ROOT_DIR             ${CMAKE_INSTALL_PREFIX} CACHE INTERNAL "" )
 set( BOOST_ROOT                  ${GAFFER_ROOT} CACHE INTERNAL "" )
 #set( LLVM_STATIC                 ON CACHE INTERNAL "" )
 #set( LLVM_ROOT_DIR               ${GAFFER_DEPENDENCIES_ROOT} CACHE INTERNAL "" )
-set( OPENCOLORIO_ROOT_DIR        ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( OPENIMAGEIO_ROOT_DIR        ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( OSL_ROOT_DIR                ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( OPENEXR_ROOT_DIR            ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( JPEG_ROOT_DIR               ${GAFFER_ROOT} CACHE INTERNAL "" )
 #set( WITH_CYCLES_CUDA_BINARIES   ON CACHE INTERNAL "" )
-set( WITH_OPENCOLORIO            ON CACHE INTERNAL "" )
-set( OCIO_PATH                   ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( GLEW_ROOT_DIR               ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( WITH_OPENVDB                ON CACHE INTERNAL "" )
+set( WITH_NANOVDB                ON CACHE INTERNAL "" )
 set( BLOSC_ROOT_DIR              ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( OPENVDB_ROOT_DIR            ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( TBB_ROOT_DIR                ${GAFFER_ROOT} CACHE INTERNAL "" )
 set( BUILD_WITH_REZ              OFF CACHE INTERNAL "" )
+set( PUGIXML_ROOT_DIR            ${CMAKE_INSTALL_PREFIX} CACHE INTERNAL "" )
 if (MSVC)
     set( ZLIB_ROOT ${GAFFER_ROOT} CACHE INTERNAL "" )
     set( ZLIB_INCLUDE_DIRS ${GAFFER_ROOT}/include CACHE INTERNAL "" )
@@ -52,14 +53,19 @@ set(CYCLES_LIBRARIES
     cycles_bvh
     cycles_device
     cycles_graph
+    cycles_integrator
     cycles_kernel_osl
     cycles_kernel
-    cycles_render
+    cycles_scene
+    cycles_session
     cycles_subd
     cycles_util
     extern_clew
     extern_cuew
+    extern_hipew
+    extern_libc_compat
     extern_numaapi
+    extern_sky
     )
 
 set(CYCLES_INCLUDE_DIR 
@@ -81,10 +87,11 @@ find_package(Cortex REQUIRED)
 find_package(OpenEXR REQUIRED Imath)
 find_package(OSL REQUIRED)
 find_package(OpenColorIO REQUIRED)
+include_directories(SYSTEM ${OPENCOLORIO_INCLUDE_DIR})
 find_package(OpenImageIO REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(Boost REQUIRED)
-include_directories( ${Boost_INCLUDE_DIRS} )
+include_directories(${Boost_INCLUDE_DIRS})
 
 # Cycles defines
 add_definitions(
@@ -152,6 +159,10 @@ if( WITH_CYCLES_SDF )
     add_definitions( -DWITH_CYCLES_SDF=1 )
 endif()
 
+if( WITH_CYCLES_CORNER_NORMALS )
+    add_definitions( -DWITH_CYCLES_CORNER_NORMALS=1 )
+endif()
+
 link_directories( ${GAFFER_ROOT}/lib )
 
 set( IECORECYCLES_INCLUDE_DIR include/GafferCycles/IECoreCyclesPreview )
@@ -174,6 +185,10 @@ set(IECORECYCLES_CXX_FILES
     ${IECORECYCLES_SRC_DIR}/VDBAlgo.cpp
     ${IECORECYCLES_SRC_DIR}/Mikktspace/mikktspace.c
     ${IECORECYCLES_SRC_DIR}/Mikktspace/mikktspace.h
+    ${IECORECYCLES_SRC_DIR}/outputDriver/IEDisplayOutputDriver.cpp
+    ${IECORECYCLES_SRC_DIR}/outputDriver/IEDisplayOutputDriver.h
+    ${IECORECYCLES_SRC_DIR}/outputDriver/OIIOOutputDriver.cpp
+    ${IECORECYCLES_SRC_DIR}/outputDriver/OIIOOutputDriver.h
     )
 set(IECORECYCLES_H_FILES
     ${IECORECYCLES_INCLUDE_DIR}/AttributeAlgo.h
@@ -252,7 +267,7 @@ target_link_libraries(GafferCycles
     ${GFLAGS_LIBRARIES}
     ${OPENIMAGEDENOISE_LIBRARIES}
     )
-add_dependencies( GafferCycles Cycles )
+add_dependencies( GafferCycles cycles )
 
 install(TARGETS GafferCycles DESTINATION lib)
 install(FILES ${GAFFERCYCLES_H_FILES}

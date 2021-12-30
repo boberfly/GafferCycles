@@ -1,8 +1,7 @@
-# We start with CentOS 7, because it is commonly used in
-# production, and meets the glibc requirements of VFXPlatform 2018
-# (2.17 or lower).
+# We start with CentOS 7, because it is commonly used in production, and meets
+# the glibc requirements of VFXPlatform 2022 (2.17 or lower).
 
-FROM centos:7.6.1810
+FROM centos:7.9.2009
 
 # As we don't want to inadvertently grab newer versions of our yum-installed
 # packages, we use yum-versionlock to keep them pinned. We track the list of
@@ -27,8 +26,12 @@ FROM centos:7.6.1810
 # otherwise we get `scl not found` errors...
 #
 RUN yum install -y centos-release-scl && \
-	sed -i 's/7/7.6.1810/g; s|^#\s*\(baseurl=http://\)mirror|\1vault|g; /mirrorlist/d' /etc/yum.repos.d/CentOS-SCLo-*.repo && \
-	yum install -y devtoolset-6 && \
+	yum install -y devtoolset-9 && \
+#
+#	Install Python 3, and enable it so that `pip install` installs modules for
+#	it rather than the system Python (which is stuck at the unsupported 2.7).
+	yum install -y rh-python38 && \
+	source /opt/rh/rh-python38/enable && \
 #
 #	Install CMake, SCons, and other miscellaneous build tools.
 #	We install SCons via `pip install --egg` rather than by
@@ -41,8 +44,7 @@ RUN yum install -y centos-release-scl && \
 	yum install -y cmake3 && \
 	ln -s /usr/bin/cmake3 /usr/bin/cmake && \
 #
-	yum install -y python2-pip.noarch && \
-	pip install --egg scons==3.0.5 && \
+	pip install scons==3.1.52 && \
 #
 	yum install -y \
 		git \
@@ -80,7 +82,13 @@ RUN yum install -y centos-release-scl && \
 #
 	yum install -y \
 		xkeyboard-config.noarch \
-		fontconfig-devel.x86_64 && \
+		fontconfig-devel.x86_64 \
+		libxkbcommon-x11-devel.x86_64 \
+		xcb-util-renderutil-devel \
+		xcb-util-wm-devel \
+		xcb-util-devel \
+		xcb-util-image-devel \
+		xcb-util-keysyms-devel && \
 #
 #	Install Appleseed dependencies
 #
@@ -97,10 +105,10 @@ RUN yum install -y centos-release-scl && \
 #		gnome-themes-standard && \
 # Note: When updating these, also update gaffer/config/azure/build.yaml
 #	pip install \
-#		sphinx==1.8.0 \
-#		sphinx_rtd_theme==0.4.3 \
-#		recommonmark==0.5.0 \
-#		docutils==0.12 && \
+#		sphinx==4.3.1 \
+#		sphinx_rtd_theme==1.0.0 \
+#		myst-parser==0.15.2 \
+#		docutils==0.17.1 && \
 #
 #	yum install -y inkscape
 
@@ -116,7 +124,7 @@ RUN yum install -y wget && \
 #
 # CUDA 11.3.1
 #
-	wget -O cuda.rpm https://developer.download.nvidia.com/compute/cuda/11.3.1/local_installers/cuda-repo-rhel7-11-3-local-11.3.1_465.19.01-1.x86_64.rpm --progress=dot:mega \
+	wget -O cuda.rpm https://developer.download.nvidia.com/compute/cuda/11.5.1/local_installers/cuda-repo-rhel7-11-5-local-11.5.1_495.29.05-1.x86_64.rpm --progress=dot:mega \
 	&& rpm -i cuda.rpm && yum install -y cuda && rm cuda.rpm && \
 #
 # ISPC 1.15
@@ -124,14 +132,14 @@ RUN yum install -y wget && \
 	wget -O ispc.tar.gz https://github.com/ispc/ispc/releases/download/v1.15.0/ispc-v1.15.0-linux.tar.gz -- \
 	&& mkdir /ispc && tar xf ispc.tar.gz -C /ispc --strip-components=1 && mv /ispc/bin/ispc /usr/bin/ispc && rm -rf /ispc
 
-# OptiX 7.3.0
+# OptiX 7.4.0
 
-COPY NVIDIA-OptiX-SDK-7.3.0-linux64-x86_64.sh /
-RUN mkdir /optix && ./NVIDIA-OptiX-SDK-7.3.0-linux64-x86_64.sh --skip-license --prefix=/optix --exclude-subdir
+COPY NVIDIA-OptiX-SDK-7.4.0-linux64-x86_64.sh /
+RUN mkdir /optix && ./NVIDIA-OptiX-SDK-7.4.0-linux64-x86_64.sh --skip-license --prefix=/optix --exclude-subdir
 
 # Copy over build script and set an entry point that
 # will use the compiler we want.
 
 COPY build.py ./
 
-ENTRYPOINT [ "scl", "enable", "devtoolset-6", "--", "bash" ]
+ENTRYPOINT [ "scl", "enable", "devtoolset-9", "rh-python38", "--", "bash" ]

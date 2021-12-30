@@ -60,7 +60,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument(
 	"--gafferVersion",
-	default = "0.59.6.0",
+	default = "0.61.1.1",
 	help = "The version of Gaffer to build against. "
 )
 
@@ -358,7 +358,8 @@ depCommands = [
 	"./build/build.py --project Glog --gafferRoot {gafferRoot} --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx} && "
 	"./build/build.py --project Embree --gafferRoot {gafferRoot} --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx} && "
 	"./build/build.py --project OpenImageDenoise --gafferRoot {gafferRoot} --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} --forceCxxCompiler {cxx} && "
-	"./build/build.py --project NanoVDB --buildDir {gafferCyclesRoot}/install/{platform}_{buildType}".format( 
+	"./build/build.py --project NanoVDB --buildDir {gafferCyclesRoot}/install/{platform}_{buildType} && "\
+	"./build/build.py --project PugiXML --buildDir {gafferCyclesRoot} --gafferRoot {gafferRoot}".format( 
 		gafferCyclesRoot=gafferCyclesDirName, gafferRoot=gafferDirName, **formatVariables ),
 ]
 
@@ -379,11 +380,12 @@ commands = [
 		" -D WITH_CYCLES_EMBREE=ON"
 		" -D WITH_CYCLES_OPENSUBDIV=ON"
 		" -D WITH_CYCLES_LOGGING=ON"
-		" -D WITH_CYCLES_TEXTURE_CACHE=ON"
+		" -D WITH_CYCLES_TEXTURE_CACHE=OFF"
 		" -D WITH_CYCLES_LIGHTGROUPS=ON"
 		" -D WITH_OPENIMAGEDENOISE=ON"
 		" -D WITH_NANOVDB=ON"
-		" -D WITH_CYCLES_SDF=ON"
+		" -D WITH_CYCLES_SDF=OFF"
+		" -D WITH_CYCLES_CORNER_NORMALS=ON"
 		" -D PYTHON_VARIANT={pythonVariant}"
 		" ../..".format( gafferCyclesRoot=gafferCyclesDirName, gafferRoot=gafferDirName, withOptix=withOptix, withExperimental=str( int( formatVariables["experimental"] ) ), **formatVariables ),
 
