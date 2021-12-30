@@ -342,6 +342,7 @@ manifest = " ".join( [
 	"include/*",
 	"lib/*.cubin",
 	"lib/*.ptx",
+	"lib/*.fatbin",
 	"lib/libGafferCycles*",
 	"license/*",
 	"python/*",
@@ -386,13 +387,16 @@ commands = [
 		" -D WITH_NANOVDB=ON"
 		" -D WITH_CYCLES_SDF=OFF"
 		" -D WITH_CYCLES_CORNER_NORMALS=ON"
+        " -D WITH_CYCLES_DEVICE_HIP=ON"
+        " -D WITH_CYCLES_HIP_BINARIES=ON"
+        " -D WITH_HIP_DYNLOAD=ON"
 		" -D PYTHON_VARIANT={pythonVariant}"
 		" ../..".format( gafferCyclesRoot=gafferCyclesDirName, gafferRoot=gafferDirName, withOptix=withOptix, withExperimental=str( int( formatVariables["experimental"] ) ), **formatVariables ),
 
 	"cd build/{platform}_{buildType} && cmake --build . --config {buildType} --target install -- -j {jobs}".format( jobs=multiprocessing.cpu_count(), **formatVariables ),
-	"mv install/{platform}_{buildType}/lib/cmake /tmp/cmake && "
+	"mv install/{platform}_{buildType}/lib/cmake /tmp/cmake && mv install/{platform}_{buildType}/lib/pkgconfig /tmp/pkgconfig &&"
 	"if [ -d \"install/{platform}_{buildType}/lib64\" ]; then mv install/{platform}_{buildType}/lib64/* install/{platform}_{buildType}/lib; fi && "
-	"mv /tmp/cmake/* install/{platform}_{buildType}/lib/cmake".format( **formatVariables ),
+	"mv /tmp/cmake/* install/{platform}_{buildType}/lib/cmake && mv /tmp/pkgconfig/* install/{platform}_{buildType}/lib/pkgconfig".format( **formatVariables ),
 
 	"cd install/{platform}_{buildType} && "
 	"tar -c -z -f /tmp/intermediate.tar {manifest} && "

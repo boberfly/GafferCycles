@@ -122,20 +122,25 @@ RUN yum install -y centos-release-scl && \
 RUN yum install -y wget
 #
 #
-# CUDA 11.3.1
+# CUDA 11.5.1
 #
 RUN	wget -O cuda.rpm https://developer.download.nvidia.com/compute/cuda/11.5.1/local_installers/cuda-repo-rhel7-11-5-local-11.5.1_495.29.05-1.x86_64.rpm --progress=dot:mega \
 	&& rpm -i cuda.rpm && yum install -y cuda && rm cuda.rpm
 #
-# ISPC 1.15
+# ISPC 1.16.1
 #
 RUN wget -O ispc.tar.gz https://github.com/ispc/ispc/releases/download/v1.16.1/ispc-v1.16.1-linux.tar.gz -- \
 	&& mkdir /ispc && tar xf ispc.tar.gz -C /ispc --strip-components=1 && mv /ispc/bin/ispc /usr/bin/ispc && rm -rf /ispc
-
+#
 # OptiX 7.4.0
-
+#
 COPY NVIDIA-OptiX-SDK-7.4.0-linux64-x86_64.sh /
 RUN mkdir /optix && chmod +x NVIDIA-OptiX-SDK-7.4.0-linux64-x86_64.sh && ./NVIDIA-OptiX-SDK-7.4.0-linux64-x86_64.sh --skip-license --prefix=/optix --exclude-subdir
+#
+# ROCm/HIP 4.5
+#
+RUN echo -e "[ROCm]\nname=ROCm\nbaseurl=https://repo.radeon.com/rocm/yum/4.5\nenabled=1\ngpgcheck=0" >> /etc/yum.repos.d/rocm.repo \
+	&& yum install -y rocm-dev rocm-libs
 
 # Copy over build script and set an entry point that
 # will use the compiler we want.
